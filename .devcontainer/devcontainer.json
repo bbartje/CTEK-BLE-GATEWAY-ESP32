@@ -1,0 +1,36 @@
+{
+  "name": "Vibe coding workshop",
+  // Klein Node-image (0,6 GB) in plaats van het universal-image (3,8 GB): een nieuwe Codespace start veel sneller.
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  // 2 cores is genoeg en verbruikt de gratis Codespaces-uren half zo snel als 4.
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "waitFor": "onCreateCommand",
+  "updateContentCommand": "npm install",
+  "postCreateCommand": "",
+  "postAttachCommand": {
+    "server": "npm start"
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "WORKSHOP.md"
+      ]
+    },
+    "vscode": {
+      // Codex is de standaard. Claude Code is de reserve voor wie een eigen Claude-abonnement heeft.
+      "extensions": [
+        "anthropic.claude-code",
+        "openai.chatgpt"
+      ]
+    }
+  },
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "forwardPorts": [3000]
+}
