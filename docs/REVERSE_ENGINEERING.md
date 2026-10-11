@@ -157,7 +157,30 @@ dekken juiste/kapotte records, signed temperatuur, code-invoer, lege historie,
 cursor 0, 29.999→0, gesplitste opvraag, periodewijziging, reset, beperkte historie,
 kloktijden en overloop van `millis()`. Ook `npm run build` en `npm test` slagen.
 
-Bij oplevering volgen de echte ESP32-build, controle van chip/partities/flashbin,
-MQTT-/OTA-controles en een korte hardwareacceptatietest. Gedecompileerde
+De nieuwe runtime **0.2.0-beta.1** is gebouwd voor ESP32-WROOM-32: statisch
+RAM 66.264/327.680 bytes en app 1.164.201/1.966.080 bytes. De imageheader bevat
+ESP32 chip-ID 0, projectnaam `ctek-ble-gateway` en de juiste versie. Twee
+app-partities van 0x1E0000 passen binnen de 4 MB flash. Het echte vrije heap-
+geheugen en de taakstapels blijven onderdeel van de fysieke test.
+
+Vier hosttestsuites slagen: protocol, sessie, imageheader en telemetrie.
+De transporttest controleert dezelfde sessiecode bij verkeerde code,
+unlock-write zonder bevestiging, tijdelijke/blijvende klokfout, ongeldige
+metadata, mislukte subscribe, onvolledige historie, ontbrekende temperatuur en
+live-fallback. Image-tests weigeren korte headers, andere chips, factory-bin-
+headers en andere projectnamen. Telemetrie test de exacte vervalgrens en retries.
+
+De gebruikte SDK is ook nagelezen: NimBLE `readValue()` geeft soms gedeeltelijke
+bytes terug bij een fout en vult alleen bij succes de optionele timestamp in.
+De adapter controleert daarom die succesbevestiging en logt een leeg/ongeldig
+antwoord als fout. `getLastError()` is alleen een verbindingsstatus, geen
+betrouwbare GATT-readstatus. De callback blijft zonder blocking IO.
+De Arduino WebServer parseert queryargumenten en authenticatieheaders vóór de
+uploadcallback, dus de OTA-formuliercode is daar beschikbaar. Arduino Update
+roept `esp_ota_set_boot_partition` aan na voltooiing; dit laat ESP-IDF de
+image controleren. Deze broncontrole vervangt geen echte OTA-uitvoering.
+
+Bij oplevering volgen nog de complete factory-bin, partitie-/checksumcontrole
+en een korte hardwareacceptatietest. Gedecompileerde
 Android-schermen, advertenties, analytics, cloud-REST en Android-notificaties
 zijn niet nodig op het bord; Home Assistant verzorgt grafieken en acties.

@@ -6,11 +6,13 @@ import tempfile
 
 root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="ctek-host-tests-") as folder:
-    executable = Path(folder) / "protocol_test"
-    subprocess.run([
-        os.environ.get("CXX", "g++"), "-std=c++17", "-Wall", "-Wextra", "-Werror",
-        "-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-g",
-        "-I", str(root / "include"), str(root / "src/ctek_protocol.cpp"),
-        str(root / "test/protocol_test.cpp"), "-o", str(executable),
-    ], check=True)
-    subprocess.run([str(executable)], check=True)
+    for suite in ("protocol", "session", "image", "telemetry"):
+        executable = Path(folder) / (suite + "_test")
+        subprocess.run([
+            os.environ.get("CXX", "g++"), "-std=c++17", "-Wall", "-Wextra", "-Werror",
+            "-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-g",
+            "-I", str(root / "include"), str(root / "src/ctek_protocol.cpp"),
+            str(root / "src/ctek_session.cpp"), str(root / f"test/{suite}_test.cpp"),
+            "-o", str(executable),
+        ], check=True)
+        subprocess.run([str(executable)], check=True)
