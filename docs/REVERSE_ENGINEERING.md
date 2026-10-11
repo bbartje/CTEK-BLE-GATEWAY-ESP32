@@ -180,7 +180,37 @@ uploadcallback, dus de OTA-formuliercode is daar beschikbaar. Arduino Update
 roept `esp_ota_set_boot_partition` aan na voltooiing; dit laat ESP-IDF de
 image controleren. Deze broncontrole vervangt geen echte OTA-uitvoering.
 
-Bij oplevering volgen nog de complete factory-bin, partitie-/checksumcontrole
-en een korte hardwareacceptatietest. Gedecompileerde
+Het complete flashpakket is gemaakt en gecontroleerd:
+
+| Bestand | Grootte | SHA-256 |
+|---|---|---|
+| `ctek-esp32-wroom-32-factory.bin` | 1.236.320 bytes | `1f50e3838e47553702480046c610f784c674f3e3ddc119e658a2ae7a4aace704` |
+| `ctek-esp32-wroom-32-ota.bin` | 1.170.784 bytes | `e6cab902f7b3d5e53fd831a52ce20f78abdd4d72eb8e3dd3e396c4e555ed3497` |
+
+De factory-bin is voor **0x0**, met componenten op 0x1000 / 0x8000 / 0xE000 /
+0x10000. De onafhankelijke Python-validator controleert elke segmentgrens,
+ESP-XOR-checksum, ingesloten SHA-256, partitie-MD5, overlap, exacte 4 MB-indeling,
+inhoud van componenten op de juiste offsets en een lege configuratiezone.
+De OTA-startentry heeft sequence 1 en geldige CRC 0x4743989A: daarmee wordt
+bij de eerste boot `ota_0` geselecteerd, waar de applicatie op 0x10000 staat.
+Espressif `esptool image_info --version 2` bevestigt chip-ID 0 (ESP32), DIO,
+40 MHz, 4 MB, versie/project, geldige checksum en geldige validation hash.
+De vijfde suite (`test_release.py`) beschadigt echte imagebytes en partities,
+probeert verkeerde versies/projecten/offsets, controleert alle verpakte
+bestanden en verlangt dat de firmwarebronhash met het manifest overeenkomt.
+**Alle lokale tests en builds slagen.**
+
+De compile time in de appdescriptor komt uit de voorgebouwde Arduino-SDK en
+vermeldt 2024; die beschrijft niet de bouwdatum van deze gateway. De werkelijke
+releasebouwtijd staat expliciet in `manifest.json` als `built_at_utc`.
+
+Een GitHub Actions-workflow herhaalt build, hosttests, releasechecks en webbuild.
+De handleiding bevat één fysieke acceptatietest en een apart OTA-testpad.
+Geen sensoren, ESP32-bord of eigen Home Assistant/MQTT-broker beschikbaar hier:
+**radioverbinding, meternauwkeurigheid, bereik, werkend MQTT in jouw installatie
+en een echte OTA-herstart zijn niet getest**. Dit blijven de open hardwarepunten,
+geen bewijs dat de oplossing onmogelijk is.
+
+Gedecompileerde
 Android-schermen, advertenties, analytics, cloud-REST en Android-notificaties
 zijn niet nodig op het bord; Home Assistant verzorgt grafieken en acties.

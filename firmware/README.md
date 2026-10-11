@@ -16,6 +16,17 @@ npm run build
 npm test
 ```
 
+Complete release bouwen (inclusief bootloader/partities samenvoegen en controles):
+
+```sh
+python3 firmware/tools/build_release.py
+```
+
+De geleverde binaries staan in `releases/0.2.0-beta.1/`; de ZIP staat één niveau
+hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
+partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
+Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
+
 De dependencies in `platformio.ini` staan vast: espressif32 7.1.3,
 Arduino ESP32-package 4.20017.260907+sha.dcc1105b (core 2.0.17),
 esptool-package 2.41100.260830, NimBLE-Arduino 2.5.1,

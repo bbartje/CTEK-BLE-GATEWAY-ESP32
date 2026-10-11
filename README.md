@@ -2,6 +2,9 @@
 
 Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.1**.
 
+[Download het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.1.zip)
+en volg de [installatiehandleiding](docs/FLASHEN.md).
+
 ## Wat doet deze app?
 
 Een gateway voor maximaal vier CTEK Battery Sense-units, om de beurt uitgelezen
@@ -39,6 +42,18 @@ Firmware bouwen (PlatformIO Core 6.1.19 nodig):
 ```sh
 pio run --project-dir firmware -e esp32-wroom-32
 ```
+
+Een compleet flashpakket opnieuw maken en controleren:
+
+```sh
+python3 firmware/tools/build_release.py
+npm test
+```
+
+Het pakket bevat een manifest, SHA-256-controlesommen en de handleiding. De tests
+controleren ook corrupte bestanden en of de huidige firmwarebronnen overeenkomen
+met het geleverde pakket. GitHub Actions bouwt en controleert eveneens het pakket
+bij firmwarewijzigingen; de uitvoer staat onder de tab **Actions**.
 
 Gebruik de [flash- en installatiehandleiding](docs/FLASHEN.md) voor het Windows
 ESP32 Flash Download Tool. De complete factory-bin hoort op **0x0**; de losse
