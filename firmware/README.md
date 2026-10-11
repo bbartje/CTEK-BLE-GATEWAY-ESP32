@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De geleverde binaries staan in `releases/0.2.0-beta.1/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.2/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -53,6 +53,7 @@ de normale checksum en SHA. De OTA-headercontrole kan zo een andere app weigeren
 - `web_gateway`: configuratie, invoercontrole, logs, beheerlogin en OTA-upload.
 - `telemetry` / `firmware_image`: gedeelde en geteste beslissingen over versheid,
   spanning, tijd, foutinterval en toegestane updateheaders.
+- `admin_access`: startwachtwoord, invoercontrole en verplichte eerste wijziging.
 
 Alle NimBLE-aanroepen lopen via één worker. Opdrachten bevatten een kopie van
 adres/code en een versienummer voor de sensorplek. Een tussentijdse wijziging
@@ -130,10 +131,26 @@ Default pollinterval 300 s; instelbaar 60–900 s. Bij mislukking retry na
 30/60/120/240/300 s. Bij vier verdwenen sensoren wordt ieder om de beurt
 geprobeerd; geen eindeloze poging voor dezelfde sensor.
 
-Het beheerwachtwoord wordt op het bord willekeurig aangemaakt (16 tekens) en
-is ook het WPA2-setupwachtwoord. USB-serieel toont het wachtwoord bij opstarten;
-bewaar het privé. HTTP Basic-login en een formuliercode beschermen configuratie
-en uploads. Wachtwoorden/codes worden nooit teruggestuurd in formulieren of
+Bij lege configuratie gebruikt het bord het publieke startwachtwoord
+`CTEK-Start123`, voor WPA2-setup en HTTP-login als `admin`. Alleen de pagina om
+een eigen wachtwoord te kiezen is dan beschikbaar. Andere beheerpagina's,
+POST-acties en de multipart OTA-upload blokkeren normaal beheer totdat een
+ander geldig wachtwoord van 12–63 zichtbare ASCII-tekens is opgeslagen. Ook BLE
+en MQTT worden pas daarna gestart; de eerste setup is uitsluitend een accesspoint,
+zonder verbinding met opgeslagen thuiswifi. Het wachtwoord moet twee keer worden
+ingevuld en mag niet gelijk zijn aan het startwachtwoord.
+
+De overgang gebruikt één NVS-waarde (`admin_pw`), zonder aparte vlag die bij
+stroomuitval uit de pas kan lopen. Bij een mislukte NVS-write wordt de toegang
+in RAM niet vrijgegeven. Na opslaan herstart het bord en heeft het setupnetwerk
+het nieuwe wachtwoord. Bestaande eigen wachtwoorden uit beta.1 blijven bij OTA
+geldig; een factory-flash wist instellingen en begint opnieuw met het publieke
+startwachtwoord. PuTTY is voor installatie niet nodig. USB-serieel kan nog als
+lokale herstel-/diagnostiekmogelijkheid dienen; de opstartuitvoer bevat het
+beheerwachtwoord, dus bewaar die privé.
+
+HTTP Basic-login en een formuliercode beschermen configuratie en uploads.
+Wachtwoorden/codes worden nooit teruggestuurd in formulieren of
 diagnostics. Diagnostics bevatten wel sensoradressen; anonimiseer vóór delen.
 HTTP, MQTT en NVS zijn niet versleuteld. Gebruik een vertrouwd thuisnetwerk.
 

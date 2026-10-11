@@ -6,7 +6,7 @@ import tempfile
 
 root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="ctek-host-tests-") as folder:
-    for suite in ("protocol", "session", "image", "telemetry"):
+    for suite in ("protocol", "session", "image", "telemetry", "admin"):
         executable = Path(folder) / (suite + "_test")
         subprocess.run([
             os.environ.get("CXX", "g++"), "-std=c++17", "-Wall", "-Wextra", "-Werror",

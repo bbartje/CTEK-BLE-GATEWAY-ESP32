@@ -1,14 +1,15 @@
-# Eén keer via USB flashen; daarna via wifi beheren
+# Flashen en instellen zonder PlatformIO of PuTTY
 
 Voor jouw **ESP32-WROOM-32, ESP32-D0WD-V3 rev. 3, 4 MB flash**.
-Firmware **0.2.0-beta.1** is een softwarematig gecontroleerde bèta; de eerste
+Firmware **0.2.0-beta.2** is een softwarematig gecontroleerde bèta; de eerste
 test met jouw echte Battery Sense-units blijft nodig. Voor C3/S3/S2 is dit
 bestand ongeschikt.
 
 ## 1. Eerste flash met ESP32 Flash Download Tool
 
-Het flashpakket wordt opgeslagen onder `firmware/releases/`. Pak de ZIP eerst
-uit. Gebruik voor USB het bestand **ctek-esp32-wroom-32-factory.bin**.
+[Download direct de volledige .bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.2/ctek-esp32-wroom-32-factory.bin),
+of pak de ZIP uit `firmware/releases/` uit. Gebruik voor USB het bestand
+**ctek-esp32-wroom-32-factory.bin**. PlatformIO is niet nodig om te flashen.
 
 1. Sluit het bord met een USB-datakabel aan. Kies in het Espressif-programma
    **ChipType ESP32**, **WorkMode Develop**, **LoadMode UART**.
@@ -28,26 +29,50 @@ De factory-bin bevat bootloader op 0x1000, partitietabel op 0x8000,
 OTA-startdata op 0xE000 en app op 0x10000. Die zijn al samengevoegd; laad geen
 extra rijen naast het factory-bestand. Een losse applicatie-bin op 0x0 is fout.
 
-## 2. Configureer terwijl USB nog aangesloten is
+## 2. Configureer via wifi; PuTTY is niet nodig
 
-1. Sluit de Flash Tool zodat de COM-poort vrijkomt. Open een seriële terminal
-   (bijvoorbeeld PuTTY) op dezelfde COM-poort, **115200, 8 databits, geen
-   pariteit, 1 stopbit, geen flow control**. Druk EN/RESET.
-2. Noteer de regel **Beheerlogin: admin; uniek wachtwoord: ...**. Dit wordt
-   willekeurig op jouw bord gemaakt; er staat geen standaardwachtwoord in Git.
-   Bewaar die regel privé. Dezelfde uitvoer noemt het wifi-netwerk
-   `CTEK-Setup-xxxxxx`.
-3. Verbind je telefoon/laptop met dat setupnetwerk, met dit wachtwoord. Open
-   **http://192.168.4.1**. Log in als **admin** met hetzelfde wachtwoord.
-   Je telefoon kan dit netwerk zonder internet willen verlaten; blijf ermee verbonden.
-4. Vul de **2,4 GHz-wifi** en jouw bestaande MQTT-broker in. De broker is het
+Na een factory-flash van deze versie zijn de eerste inloggegevens:
+
+| Gegeven | Waarde |
+|---|---|
+| Wifi-netwerk | `CTEK-Setup-xxxxxx` |
+| Startwachtwoord wifi | **CTEK-Start123** |
+| Configuratieadres | **http://192.168.4.1** |
+| Gebruiker | **admin** |
+| Startwachtwoord beheer | **CTEK-Start123** |
+
+1. Laat het bord van stroom voorzien en druk na de flash op EN/RESET.
+2. Verbind je telefoon/laptop met `CTEK-Setup-xxxxxx`, met wachtwoord
+   **CTEK-Start123**. Je telefoon kan dit netwerk zonder internet willen
+   verlaten; kies om ermee verbonden te blijven.
+3. Open **http://192.168.4.1**. Als de browser om inloggen vraagt: gebruiker
+   **admin**, wachtwoord **CTEK-Start123**.
+4. Je ziet **Kies eerst je eigen wachtwoord**. Kies 12–63 tekens: letters,
+   cijfers en gewone leestekens, zonder spaties of accenten. Vul het twee keer
+   in en sla op. Het startwachtwoord mag niet als eigen wachtwoord worden gebruikt.
+   Wifi/MQTT, sensoren en firmware-upload blijven tot deze stap geblokkeerd.
+5. Het bord herstart en het setupnetwerk verdwijnt even. Verbind daarna met
+   hetzelfde `CTEK-Setup-xxxxxx`, maar met **je nieuwe wachtwoord**. Als je
+   telefoon/laptop nog het startwachtwoord gebruikt: vergeet het netwerk in de
+   wifi-instellingen en verbind opnieuw.
+6. Open opnieuw **http://192.168.4.1** en log in als **admin** met je nieuwe
+   wachtwoord. Ook de browser kan nog de oude login onthouden en opnieuw om
+   de juiste gegevens vragen. Bewaar je eigen wachtwoord privé.
+7. Vul de **2,4 GHz-wifi** en jouw bestaande MQTT-broker in. De broker is het
    adres van bijvoorbeeld de Mosquitto-add-on, niet een URL van Home Assistant.
    Vul de MQTT-gebruikersnaam/wachtwoord in; laat poort 1883 staan als dat bij
    jouw broker hoort. Sla op. De gateway herstart.
-5. Verbind de laptop weer met je gewone netwerk. De seriële uitvoer toont het
-   nieuwe gateway-IP. Open dat adres, of `http://ctek-xxxxxx.local` als jouw
-   netwerk mDNS ondersteunt. Reserveer bij voorkeur dit IP in de router.
-   Als wifi niet lukt, komt het setupnetwerk na circa één minuut terug.
+8. Verbind de laptop weer met je gewone netwerk. Open `http://ctek-xxxxxx.local`
+   als jouw netwerk dit ondersteunt (`xxxxxx` is dezelfde suffix als bij setup).
+   Anders vind je het IP-adres in de lijst met verbonden apparaten van je router;
+   de apparaatnaam is `ctek-xxxxxx`. Reserveer bij voorkeur dit IP in de router.
+   Als wifi niet lukt, komt het setupnetwerk na circa één minuut terug, met
+   **je eigen wachtwoord**.
+
+Bij een OTA-update vanuit een eerdere versie blijft je bestaande eigen
+beheerwachtwoord behouden; het startwachtwoord wordt dan niet opnieuw ingesteld.
+Als je het oude wachtwoord niet kunt uitlezen, installeer deze nieuwe factory-bin
+op **0x0**. Dat wist de oude instellingen en begint met de bovenstaande stappen.
 
 ## 3. Eén sensor testen en daarna de andere drie toevoegen
 

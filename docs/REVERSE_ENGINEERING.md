@@ -167,7 +167,7 @@ worden bewezen. Nauwkeurigheid vraagt vergelijking met een multimeter.
 Een geslaagde hosttest of firmwarebuild vervangt geen hardwaretest. OTA via
 wifi helpt alleen wanneer wifi het bord op de uiteindelijke plek bereikt.
 
-## Verificatie
+## Verificatie van de eerste release 0.2.0-beta.1
 
 Hosttests draaien de **productie-C++-kern**, niet een tweede parser in Python.
 Compileropties: `-Wall -Wextra -Werror -fsanitize=address,undefined`. De tests
@@ -232,3 +232,29 @@ geen bewijs dat de oplossing onmogelijk is.
 Gedecompileerde
 Android-schermen, advertenties, analytics, cloud-REST en Android-notificaties
 zijn niet nodig op het bord; Home Assistant verzorgt grafieken en acties.
+
+## Aanvulling 0.2.0-beta.2: eerste login zonder seriële terminal
+
+Deze versie verandert alleen de installatie en toegang tot beheer. Bij lege
+configuratie werkt `CTEK-Start123` als tijdelijk setupwifi-/beheerwachtwoord.
+De eerste webpagina vereist een ander wachtwoord, tweemaal ingevuld; overige
+beheerpagina's, POST-acties en OTA zijn tot die wijziging geblokkeerd. Ook de
+Bluetooth-worker, MQTT en verbinden met thuiswifi starten pas daarna. Een
+bestaand eigen wachtwoord blijft bij een OTA-update behouden.
+
+De productieheader `admin_access.h` is in een vijfde C++-suite getest: lege of
+ongeldige opslag, het startwachtwoord, bestaande unieke wachtwoorden, de grenzen
+van 12/63 tekens, spaties/controlbytes/niet-ASCII, twee ongelijke invoeren en alle
+combinaties van login/eerste-wijziging/toegang tot de wachtwoordpagina. Dezelfde
+toegangspolitiek beschermt ook de multipart-upload, die vóór de gewone
+routehandler wordt uitgevoerd. De nieuwe wachtwoordwaarde wordt in NVS
+geschreven voordat beheer wordt vrijgegeven; de eerste-startstatus wordt uit
+die ene waarde afgeleid, zonder aparte statusvlag.
+
+De ESP32-build is geslaagd: statisch RAM **66.264/327.680 bytes**, applicatie
+**1.167.789/1.966.080 bytes**. esptool bevestigt ESP32 chip-ID 0, DIO, 40 MHz,
+4 MB en versie `0.2.0-beta.2`, met geldige checksum en ingesloten SHA-256.
+Het nieuwe flashpakket heeft dezelfde gecontroleerde partitie-indeling en
+factory-offset **0x0**. De volledige eerste inlogprocedure, de herstart en het
+wifi-wachtwoord na wijzigen zijn nog niet op een fysiek bord getest; de nieuwe
+hosttests en build bewijzen dat radiogedrag niet.

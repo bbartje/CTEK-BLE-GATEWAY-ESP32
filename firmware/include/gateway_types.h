@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "ctek_session.h"
 
-constexpr char kFirmwareVersion[] = "0.2.0-beta.1";
+constexpr char kFirmwareVersion[] = "0.2.0-beta.2";
 constexpr uint32_t kStaleSeconds = 1800;
 constexpr size_t kScanLimit = 24;
 
@@ -68,6 +68,8 @@ bool enqueueBle(const BleJob& job);
 bool receiveBle(BleReport& report);
 void loadConfiguration();
 void saveConfiguration();
+bool initialSetupPending();
+bool saveAdminPassword(const String& password);
 void saveSensors();
 void startNetwork();
 void serviceNetwork();

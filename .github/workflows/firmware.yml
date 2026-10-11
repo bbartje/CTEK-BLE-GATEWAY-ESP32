@@ -21,10 +21,10 @@ jobs:
           python-version: '3.12'
       - run: pip install platformio==6.1.19
       - run: npm ci
-      - run: python3 firmware/tools/build_release.py --output /tmp/ctek-release/0.2.0-beta.1
+      - run: python3 firmware/tools/build_release.py --output /tmp/ctek-release/0.2.0-beta.2
       - run: npm run build
       - run: npm test
-      - run: python3 firmware/tools/test_release.py --release /tmp/ctek-release/0.2.0-beta.1
+      - run: python3 firmware/tools/test_release.py --release /tmp/ctek-release/0.2.0-beta.2
       - uses: actions/upload-artifact@v4
         with:
           name: ctek-esp32-wroom-32-flashpakket

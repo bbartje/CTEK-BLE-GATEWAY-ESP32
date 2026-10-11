@@ -1,11 +1,20 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.1**.
+Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.2**.
 
-[Download het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.1/ctek-esp32-wroom-32-0.2.0-beta.1.zip)
+[Download de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.2/ctek-esp32-wroom-32-factory.bin)
+of [het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.2/ctek-esp32-wroom-32-0.2.0-beta.2.zip)
 en volg de [installatiehandleiding](docs/FLASHEN.md).
-De [bètarelease 0.2.0-beta.1](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.1)
+De [bètarelease 0.2.0-beta.2](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.2)
 bevat ook de losse flashbestanden, controlesommen en bouwgegevens.
+
+**PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de
+eerste factory-flash verbind je met `CTEK-Setup-xxxxxx`, met startwachtwoord
+**CTEK-Start123**. Open **http://192.168.4.1**, log in als **admin** met hetzelfde
+startwachtwoord en kies verplicht een eigen wachtwoord. Daarna herstart het
+bord; verbind en log opnieuw in met je nieuwe wachtwoord. Pas dan kun je wifi,
+MQTT en sensoren instellen. Een update via wifi behoudt een bestaand eigen
+beheerwachtwoord; de factory-flash wist de eerdere instellingen.
 
 ## Wat doet deze app?
 
@@ -78,8 +87,10 @@ Batterijspanning, temperatuur, sensoradressen en meettijden. Wifi-/MQTT-wachtwoo
 en verbindingscodes worden op het bord ingesteld en horen nooit in Git.
 De ESP32 bewaart instellingen lokaal; Home Assistant bewaart de metingen volgens
 de eigen instellingen. Er is geen CTEK-cloudaccount nodig voor het gevonden protocol.
-Bij de eerste start genereert het bord een eigen beheerwachtwoord; dit lees je
-op USB-serieel op 115200 baud. Instellingen staan in het niet-versleutelde NVS-
+Het bekende startwachtwoord werkt alleen tijdens de eerste setup; de webpagina
+blokkeert normaal beheer totdat je een eigen wachtwoord hebt opgeslagen.
+Daarna is dit eigen wachtwoord ook het setupwifi-wachtwoord. Instellingen staan
+in het niet-versleutelde NVS-
 flashgeheugen en worden bij OTA behouden. De verbindingen zijn HTTP en MQTT
 zonder TLS; gebruik het eigen vertrouwde netwerk. Tijdsynchronisatie gebruikt
 `pool.ntp.org` en `time.cloudflare.com`. Bij ontbreken van tijd worden geen

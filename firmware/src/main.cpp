@@ -64,7 +64,7 @@ void processReport() {
 }
 
 void dispatch() {
-  if (!bleReady || workInFlight || otaMode || !ctek::elapsed(millis(), lastDispatch, 1000)) return;
+  if (!bleReady || initialSetupPending() || workInFlight || otaMode || !ctek::elapsed(millis(), lastDispatch, 1000)) return;
   BleJob job;
   if (scanRequested) {
     job.kind = BleJobKind::Scan;
@@ -91,20 +91,21 @@ void dispatch() {
 
 void setup() {
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);  // Enable RF entropy before generating the first administrator password.
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_STA);  // Enable RF entropy for the form nonce; no station connection yet.
   loadConfiguration();
   startNetwork();
   startMqtt();
   startWeb();
-  bleReady = startBleWorker();
+  bleReady = !initialSetupPending() && startBleWorker();
   Serial.printf("CTEK gateway %s; ESP32, flash=%u bytes; BLE-taak=%s\n",
-                kFirmwareVersion, ESP.getFlashChipSize(), bleReady ? "gestart" : "MISLUKT");
+                kFirmwareVersion, ESP.getFlashChipSize(), initialSetupPending() ? "wacht op eigen wachtwoord" : (bleReady ? "gestart" : "MISLUKT"));
 }
 void loop() {
   processReport();
   serviceNetwork();
   serviceWeb();
-  if (!otaMode) serviceMqtt();
+  if (!otaMode && !initialSetupPending()) serviceMqtt();
   dispatch();
   delay(2);
 }

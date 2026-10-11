@@ -1,4 +1,5 @@
 #include "gateway_types.h"
+#include "admin_access.h"
 #include "firmware_image.h"
 #include <ArduinoJson.h>
 #include <Update.h>
@@ -28,12 +29,17 @@ String escape(const String& text) {
   }
   return output;
 }
-bool authorized() {
-  if (web.authenticate("admin", config.adminPassword.c_str())) return true;
+bool authorized(bool passwordPage = false) {
+  web.sendHeader("Cache-Control", "no-store");
+  auto access = ctek::webAccess(web.authenticate("admin", config.adminPassword.c_str()), initialSetupPending(), passwordPage);
+  if (access == ctek::WebAccess::Allowed) return true;
+  if (access == ctek::WebAccess::PasswordChangeRequired) {
+    web.sendHeader("Location", "/password"); web.send(303); return false;
+  }
   web.requestAuthentication(BASIC_AUTH, "CTEK gateway"); return false;
 }
-bool mutation() {
-  if (!authorized()) return false;
+bool mutation(bool passwordPage = false) {
+  if (!authorized(passwordPage)) return false;
   if (web.arg("csrf") == csrf) return true;
   web.send(403, "text/plain; charset=utf-8", "Formulier verlopen. Open de hoofdpagina opnieuw.");
   return false;
@@ -47,6 +53,43 @@ String input(const char* name, const char* label, const String& value, const cha
 }
 void redirect() { web.sendHeader("Location", "/"); web.send(303); }
 void error(const char* message) { web.send(400, "text/plain; charset=utf-8", message); }
+void passwordPage(const char* message = nullptr) {
+  String page = startPage();
+  page += "<h2>Kies eerst je eigen wachtwoord</h2><p>Welkom. Vervang het eenmalige startwachtwoord voordat je de gateway instelt. Je eigen wachtwoord geldt voor de beheerlogin en het setupnetwerk.</p>";
+  if (message) page += "<p role='alert'>" + escape(message) + "</p>";
+  page += "<form method='post' action='/password'>" + token();
+  page += input("new_password", "Nieuw wachtwoord (12–63 tekens, zonder spaties)", "", "type='password' required minlength='12' maxlength='63' autocomplete='new-password'");
+  page += input("confirm_password", "Herhaal het nieuwe wachtwoord", "", "type='password' required minlength='12' maxlength='63' autocomplete='new-password'");
+  page += "<button>Wachtwoord opslaan en herstarten</button></form><p>De gateway herstart na het opslaan. Verbind daarna opnieuw met het setupnetwerk met je nieuwe wachtwoord en open http://192.168.4.1. Verwijder zo nodig het oude wifi-netwerk uit je opgeslagen netwerken.</p></body></html>";
+  web.send(message ? 400 : 200, "text/html; charset=utf-8", page);
+}
+void firstPassword() {
+  if (!authorized(true)) return;
+  if (!initialSetupPending()) { redirect(); return; }
+  passwordPage();
+}
+void setFirstPassword() {
+  if (!mutation(true)) return;
+  if (!initialSetupPending()) { redirect(); return; }
+  String password = web.arg("new_password"), confirmation = web.arg("confirm_password");
+  auto problem = ctek::checkInitialPassword(std::string_view(password.c_str(), password.length()),
+                                          std::string_view(confirmation.c_str(), confirmation.length()));
+  if (problem == ctek::PasswordProblem::Invalid) {
+    passwordPage("Gebruik 12–63 zichtbare tekens zonder spaties; letters, cijfers en gewone leestekens zijn toegestaan."); return;
+  }
+  if (problem == ctek::PasswordProblem::UnchangedDefault) {
+    passwordPage("Kies een eigen wachtwoord dat anders is dan het startwachtwoord."); return;
+  }
+  if (problem == ctek::PasswordProblem::Mismatch) {
+    passwordPage("De twee wachtwoorden zijn niet gelijk. Vul ze opnieuw in."); return;
+  }
+  if (!saveAdminPassword(password)) {
+    passwordPage("Het wachtwoord kon niet worden opgeslagen. De eerste instelling blijft geblokkeerd; probeer opnieuw."); return;
+  }
+  web.send(200, "text/html; charset=utf-8", startPage() +
+    "<h2>Eigen wachtwoord opgeslagen</h2><p>De gateway herstart nu. Verbind opnieuw met het setupnetwerk met je nieuwe wachtwoord en open <strong>http://192.168.4.1</strong>.</p><p>Als je apparaat nog het oude wifi-wachtwoord gebruikt: vergeet dit netwerk en verbind opnieuw. Log daarna in als <strong>admin</strong> met je nieuwe wachtwoord. Je kunt vervolgens wifi, MQTT en sensoren instellen.</p></body></html>");
+  delay(400); ESP.restart();
+}
 bool number(const String& text, long minimum, long maximum, long& output) {
   if (text.isEmpty() || text.length() > 10) return false;
   for (char c : text) if (c < '0' || c > '9') return false;
@@ -138,21 +181,20 @@ void save() {
       user.length() > 64 || password.length() > 128 ||
       !number(web.arg("mqtt_port"), 1, 65535, port) || !number(web.arg("poll_seconds"), 60, 900, poll) ||
       voltageText.isEmpty() || !end || *end || !std::isfinite(voltage) || voltage < 8 || voltage > 16 ||
-      (!admin.isEmpty() && (admin.length() < 12 || admin.length() > 63))) {
+      (!admin.isEmpty() && !ctek::validReplacementPassword(std::string_view(admin.c_str(), admin.length())))) {
     error("Ongeldige instellingen. Controleer netwerknamen, poort, interval, spanning en wachtwoordlengte."); return;
   }
   for (char c : host) if (!(isalnum(static_cast<unsigned char>(c)) || c == '.' || c == '-' || c == ':')) {
     error("Gebruik alleen een IP-adres of hostnaam voor de MQTT-broker, zonder http:// of spaties."); return;
   }
-  if (!admin.isEmpty()) for (unsigned char c : admin) if (c < 33 || c > 126) {
-    error("Gebruik 12–63 zichtbare ASCII-tekens zonder spaties voor het beheerwachtwoord."); return;
+  if (!admin.isEmpty() && !saveAdminPassword(admin)) {
+    error("Het nieuwe beheerwachtwoord kon niet worden opgeslagen. Probeer opnieuw."); return;
   }
   config.ssid = ssid; config.mqttHost = host; config.mqttPort = port; config.mqttUser = user;
   config.pollSeconds = poll; config.lowVoltage = voltage;
   if (web.arg("open_wifi") == "1") config.wifiPassword = "";
   else if (!wifi.isEmpty()) config.wifiPassword = wifi;
   if (!password.isEmpty()) config.mqttPassword = password;
-  if (!admin.isEmpty()) config.adminPassword = admin;
   saveConfiguration();
   web.send(200, "text/html; charset=utf-8", startPage() + "<p>Opgeslagen. De gateway herstart; verbind daarna met het ingestelde netwerk.</p></body></html>");
   delay(400); ESP.restart();
@@ -237,7 +279,8 @@ void failUpload(const String& reason) { otaError = reason; if (uploadStarted) Up
 void upload() {
   auto& current = web.upload(); otaActivity = millis();
   if (current.status == UPLOAD_FILE_START) {
-    uploadAllowed = web.authenticate("admin", config.adminPassword.c_str()) && web.arg("csrf") == csrf && otaMode && !workInFlight;
+    uploadAllowed = ctek::webAccess(web.authenticate("admin", config.adminPassword.c_str()), initialSetupPending()) == ctek::WebAccess::Allowed &&
+                    web.arg("csrf") == csrf && otaMode && !workInFlight;
     uploadStarted = uploadDone = false; otaError = ""; prefixSize = uploadedBytes = 0;
     if (!uploadAllowed) otaError = "Update niet toegestaan: controleer login en updatepauze.";
   } else if (current.status == UPLOAD_FILE_WRITE && uploadAllowed && otaError.isEmpty()) {
@@ -265,6 +308,7 @@ void upload() {
 void startWeb() {
   char nonce[17]; snprintf(nonce, sizeof(nonce), "%08lx%08lx", (unsigned long)esp_random(), (unsigned long)esp_random()); csrf = nonce;
   web.on("/", HTTP_GET, root); web.on("/save", HTTP_POST, save);
+  web.on("/password", HTTP_GET, firstPassword); web.on("/password", HTTP_POST, setFirstPassword);
   web.on("/sensor", HTTP_POST, sensor); web.on("/remove", HTTP_POST, removeSensor);
   web.on("/poll", HTTP_POST, poll); web.on("/scan", HTTP_POST, scan);
   web.on("/diagnostics", HTTP_GET, diagnostics);

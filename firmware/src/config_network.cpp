@@ -1,9 +1,9 @@
 #include "gateway_types.h"
+#include "admin_access.h"
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
 #include <WiFi.h>
-#include <esp_system.h>
 #include <cstring>
 
 namespace {
@@ -14,16 +14,23 @@ String hostname;
 
 void openSetup() {
   if (apStarted) return;
-  WiFi.mode(WIFI_AP_STA);
+  WiFi.mode(initialSetupPending() ? WIFI_AP : WIFI_AP_STA);
   apStarted = WiFi.softAP(setupSsid.c_str(), config.adminPassword.c_str(), 1, false, 1);
   Serial.printf("Setup-wifi: %s; adres http://192.168.4.1; WPA2-wachtwoord = beheerwachtwoord\n", setupSsid.c_str());
 }
-String generatedPassword() {
-  constexpr char alphabet[] = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
-  String password;
-  for (size_t i = 0; i < 16; ++i) password += alphabet[esp_random() % (sizeof(alphabet) - 1)];
-  return password;
 }
+
+bool initialSetupPending() {
+  return ctek::passwordChangeRequired(std::string_view(config.adminPassword.c_str(), config.adminPassword.length()));
+}
+
+bool saveAdminPassword(const String& password) {
+  if (!ctek::validReplacementPassword(std::string_view(password.c_str(), password.length()))) return false;
+  // A single NVS value defines both the password and the first-start state.
+  // Do not unlock the configuration in RAM if persisting the password failed.
+  if (preferences.putString("admin_pw", password) != password.length()) return false;
+  config.adminPassword = password;
+  return true;
 }
 
 void loadConfiguration() {
@@ -39,10 +46,8 @@ void loadConfiguration() {
   config.lowVoltage = preferences.getFloat("low_v", 12.2f);
   if (!(config.lowVoltage >= 8 && config.lowVoltage <= 16)) config.lowVoltage = 12.2f;
   config.adminPassword = preferences.getString("admin_pw", "");
-  if (config.adminPassword.length() < 12 || config.adminPassword.length() > 63) {
-    config.adminPassword = generatedPassword();
-    preferences.putString("admin_pw", config.adminPassword);
-  }
+  if (!ctek::validAdminPassword(std::string_view(config.adminPassword.c_str(), config.adminPassword.length())))
+    config.adminPassword = ctek::kInitialAdminPassword;
   JsonDocument stored;
   if (deserializeJson(stored, preferences.getString("sensors", "[]"))) return;
   size_t slot = 0;
@@ -98,14 +103,18 @@ void startNetwork() {
   WiFi.setAutoReconnect(true);
   // Configuration is stored with Preferences; avoid writing Wi-Fi state on every retry.
   WiFi.persistent(false);
-  Serial.printf("Beheerlogin: admin; uniek wachtwoord: %s\n", config.adminPassword.c_str());
+  Serial.printf("Beheerlogin: admin; %swachtwoord: %s\n",
+                initialSetupPending() ? "eenmalig start" : "eigen ", config.adminPassword.c_str());
   Serial.println("Bewaar dit wachtwoord lokaal; deel deze regel niet in diagnostics.");
-  if (config.ssid.isEmpty()) openSetup();
+  if (initialSetupPending() || config.ssid.isEmpty()) openSetup();
   else WiFi.begin(config.ssid.c_str(), config.wifiPassword.c_str());
   disconnectedSince = lastReconnect = millis();
 }
 
 void serviceNetwork() {
+  // The known bootstrap password is only available on the setup AP.
+  // Saved station credentials may only be used after choosing a private password.
+  if (initialSetupPending()) { openSetup(); return; }
   bool connected = WiFi.status() == WL_CONNECTED;
   if (connected && !wasConnected) {
     Serial.printf("Wifi verbonden; configuratie http://%s of http://%s.local\n",
