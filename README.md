@@ -14,9 +14,11 @@ begint. De BLE-log toont hun lees-/schrijfmogelijkheden en maakt onderscheid
 tussen een ontbrekend leespunt, ontbrekende leestoegang en een mislukte read.
 Een verstuurd ontgrendelbericht bevestigt de code nog niet. Bij een mislukte
 Bluetooth-verbinding meldt de gateway dat de code niet is verstuurd; een
-verbindingsstatus wordt niet meer als readstatus gepresenteerd. Deze wijziging
-moet nog met de echte sensoren worden getest; hij garandeert geen geslaagde
-uitlezing. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.3.md).
+verbindingsstatus wordt niet meer als readstatus gepresenteerd. De eerste
+sensortest met beta.3 vindt alle negen Bluetooth-punten bij de sensor in plek 2;
+de verbinding is na de ontgrendelwrite verbroken voordat de klok wordt gelezen.
+Er is nog geen geslaagde meting. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.3.md)
+en [de opgeslagen teststatus en vervolgstappen](docs/VERVOLGTEST.md).
 
 **PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de
 eerste factory-flash verbind je met `CTEK-Setup-xxxxxx`, met startwachtwoord
