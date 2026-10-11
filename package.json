@@ -11,7 +11,7 @@
     "start": "BROWSER=none WDS_SOCKET_PORT=0 vite --port 3000",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run && python3 firmware/tools/test_host.py"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",

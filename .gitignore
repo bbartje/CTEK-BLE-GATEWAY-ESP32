@@ -128,3 +128,9 @@ yarn-error.log*
 
 # Persoonlijke instellingen van Claude Code
 .claude/settings.local.json
+
+# Firmware: tool caches and private runtime configuration
+firmware/.pio/
+__pycache__/
+*.pyc
+firmware/secrets*
