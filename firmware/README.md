@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.2/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.3/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -63,6 +63,17 @@ Verbindingspoging maximaal 7 s; notificaties maximaal 15 s per aanvraagdeel.
 Een individuele GATT-procedure heeft NimBLE's eigen 30 s timeout; een sessie kan
 bij slecht radiocontact langer duren. De hoofdtaak blijft intussen beschikbaar.
 MQTT-TCP-pogingen zijn begrensd op 1,5 s (DNS kan extra tijd kosten).
+
+Vanaf beta.3 roept de worker `getCharacteristics(true)` aan voor volledige
+GATT-discovery binnen de CTEK-service. Zonder `true` geeft NimBLE 2.5.1 alleen
+eerder gevonden punten terug. De log bevat aantal, UUID en lees-/schrijf- en
+notificatiemogelijkheden. De adapter meldt ontbrekende punten en `read=0`
+afzonderlijk van een echte mislukte read. De sessie behoudt deze foutdetails
+na de begrensde klokretry. NimBLE-foutteksten zijn ingeschakeld; de beheerpagina
+toont alleen een niet-nul verbindingsstatus, als verbindingsstatus. Een
+ontgrendelwrite geldt nooit als bewijs van een juiste code. De softwaretests
+dekken de foutdetails, herstel na een tijdelijke fout en de optionele
+temperatuur-read; radio- en GATT-gedrag van deze update vereisen een sensortest.
 
 ## MQTT-contract
 

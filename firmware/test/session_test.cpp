@@ -9,6 +9,8 @@ struct ScriptedTransport : ctek::Transport {
   ctek::Metadata metadata{9000360, 5, 1};
   bool unlockOk = true, clockOk = true, periodOk = true, subscribeOk = true, fetchOk = true;
   bool temperatureOk = true, voltageOk = true, retryClock = false;
+  const char* readFailure = nullptr;
+  const char* lastReadFailure = nullptr;
   int reads = 0;
   std::vector<std::string> operations;
   std::vector<ctek::Range> requests;
@@ -19,6 +21,8 @@ struct ScriptedTransport : ctek::Transport {
   }
   bool read(const char* uuid, uint8_t* data, size_t capacity, size_t& length) override {
     operations.push_back(uuid); length = 0;
+    // A successful read clears an earlier failure, including an optional temperature read.
+    lastReadFailure = readFailure;
     if (std::string(uuid) == ctek::kClock) {
       if (!clockOk || (retryClock && reads++ == 0)) return false;
       assert(capacity >= 4); length = 4;
@@ -35,8 +39,10 @@ struct ScriptedTransport : ctek::Transport {
       if (!voltageOk) return false;
       assert(capacity >= 2); length = 2; data[0] = 0; data[1] = 0x64;
     } else { assert(false); }
+    lastReadFailure = nullptr;
     return true;
   }
+  const char* readError() const override { return lastReadFailure; }
   bool subscribe() override { operations.push_back("subscribe"); return subscribeOk; }
   bool fetch(const ctek::Range& range, ctek::Sample* out, size_t capacity) override {
     operations.push_back("fetch"); requests.push_back(range);
@@ -66,10 +72,26 @@ int main() {
   ScriptedTransport locked; locked.clockOk = false;
   assert(!runSession(locked, code, nullptr).success && locked.requests.empty());
   assert(locked.operations.size() == 5);  // Write success is not authentication success; one retry only.
+  for (const char* detail : {"Bluetooth-leespunt niet gevonden; zie BLE-log",
+                            "Bluetooth-leespunt biedt geen leestoegang; zie BLE-log",
+                            "Bluetooth-verbinding verbroken voor uitlezen; zie BLE-log"}) {
+    ScriptedTransport inaccessible; inaccessible.clockOk = false; inaccessible.readFailure = detail;
+    result = runSession(inaccessible, code, nullptr);
+    assert(!result.success && result.count == 0 && std::string(result.error) == detail);
+    assert(inaccessible.operations.size() == 5 && inaccessible.requests.empty());
+  }
   ScriptedTransport retry; retry.retryClock = true;
   assert(runSession(retry, code, nullptr).success && retry.reads == 2);
+  ScriptedTransport retryDetail; retryDetail.retryClock = true;
+  retryDetail.readFailure = "Tijdelijke Bluetooth-readfout";
+  result = runSession(retryDetail, code, nullptr);
+  assert(result.success && std::string(result.error) == "Meting ontvangen" && retryDetail.readError() == nullptr);
   ScriptedTransport badPeriod; badPeriod.periodOk = false;
   assert(!runSession(badPeriod, code, nullptr).success);
+  ScriptedTransport missingPeriod; missingPeriod.periodOk = false;
+  missingPeriod.readFailure = "Bluetooth-leespunt niet gevonden; zie BLE-log";
+  result = runSession(missingPeriod, code, nullptr);
+  assert(!result.success && std::string(result.error) == missingPeriod.readFailure);
   ScriptedTransport invalid; invalid.metadata.cursor = 30000;
   assert(!runSession(invalid, code, nullptr).success);
   ScriptedTransport noNotify; noNotify.subscribeOk = false;
@@ -87,5 +109,13 @@ int main() {
   assert(!runSession(newborn, code, nullptr).success);
   ScriptedTransport noLive; noLive.metadata = {30, 5, 0}; noLive.voltageOk = false;
   assert(!runSession(noLive, code, nullptr).success);
-  std::cout << "Sessietests geslaagd: volgorde, unlockbevestiging, retries, historie en live-fallback.\n";
+  ScriptedTransport noLiveDetail; noLiveDetail.metadata = {30, 5, 0}; noLiveDetail.voltageOk = false;
+  noLiveDetail.readFailure = "Bluetooth-read mislukt; zie BLE-log";
+  result = runSession(noLiveDetail, code, nullptr);
+  assert(!result.success && std::string(result.error) == noLiveDetail.readFailure);
+  ScriptedTransport optionalFailure; optionalFailure.metadata = {30, 5, 0}; optionalFailure.temperatureOk = false;
+  optionalFailure.readFailure = "Bluetooth-leespunt niet gevonden; zie BLE-log";
+  result = runSession(optionalFailure, code, nullptr);
+  assert(result.success && result.live && !result.currentTemperatureValid && optionalFailure.readError() == nullptr);
+  std::cout << "Sessietests geslaagd: volgorde, unlockbevestiging, foutdetails, retries, historie en live-fallback.\n";
 }

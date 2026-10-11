@@ -15,13 +15,15 @@ SessionResult runSession(Transport& io, const std::string& code, const Metadata*
     clockRead = io.read(kClock, clock, sizeof(clock), clockSize);
   }
   if (!clockRead || clockSize != sizeof(clock)) {
-    result.error = "Klok-read mislukt na unlock; controleer code, bereik en telefoonverbinding";
+    const char* detail = io.readError();
+    result.error = detail ? detail : "Klok-read mislukt na unlock; controleer code, bereik en telefoonverbinding";
     return result;
   }
   if (!io.read(kPeriod, period, sizeof(period), periodSize) ||
       !io.read(kCursor, cursor, sizeof(cursor), cursorSize) ||
       !parseMetadata(clock, clockSize, period, periodSize, cursor, cursorSize, result.metadata)) {
-    result.error = "Ongeldige klok, meetperiode of historiecursor";
+    const char* detail = io.readError();
+    result.error = detail ? detail : "Ongeldige klok, meetperiode of historiecursor";
     return result;
   }
   uint8_t temperature[1]; size_t temperatureSize = 0;
@@ -32,7 +34,8 @@ SessionResult runSession(Transport& io, const std::string& code, const Metadata*
     uint8_t voltage[20]; size_t voltageSize = 0;
     if (!io.read(kLiveVoltage, voltage, sizeof(voltage), voltageSize) ||
         !decodeLiveVoltage(voltage, voltageSize, result.samples[0].voltage)) {
-      result.error = "Geen historie en live-spanning niet beschikbaar";
+      const char* detail = io.readError();
+      result.error = detail ? detail : "Geen historie en live-spanning niet beschikbaar";
       return result;
     }
     result.live = true;

@@ -1,12 +1,22 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.2**.
+Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.3**.
 
-[Download de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.2/ctek-esp32-wroom-32-factory.bin)
-of [het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.2/ctek-esp32-wroom-32-0.2.0-beta.2.zip)
+[Download de wifi-update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-ota.bin),
+[de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-factory.bin)
+of [het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-0.2.0-beta.3.zip)
 en volg de [installatiehandleiding](docs/FLASHEN.md).
-De [bètarelease 0.2.0-beta.2](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.2)
+De [bètarelease 0.2.0-beta.3](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
 bevat ook de losse flashbestanden, controlesommen en bouwgegevens.
+
+Beta.3 zoekt de Bluetooth-leespunten daadwerkelijk op voordat de uitlezing
+begint. De BLE-log toont hun lees-/schrijfmogelijkheden en maakt onderscheid
+tussen een ontbrekend leespunt, ontbrekende leestoegang en een mislukte read.
+Een verstuurd ontgrendelbericht bevestigt de code nog niet. Bij een mislukte
+Bluetooth-verbinding meldt de gateway dat de code niet is verstuurd; een
+verbindingsstatus wordt niet meer als readstatus gepresenteerd. Deze wijziging
+moet nog met de echte sensoren worden getest; hij garandeert geen geslaagde
+uitlezing. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.3.md).
 
 **PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de
 eerste factory-flash verbind je met `CTEK-Setup-xxxxxx`, met startwachtwoord

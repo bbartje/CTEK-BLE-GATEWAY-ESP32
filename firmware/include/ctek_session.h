@@ -8,6 +8,8 @@ class Transport {
   virtual ~Transport() = default;
   virtual bool unlock(const std::array<uint8_t, 32>& input) = 0;
   virtual bool read(const char* uuid, uint8_t* output, size_t capacity, size_t& length) = 0;
+  // Return only static text: SessionResult outlives the transport and BLE client.
+  virtual const char* readError() const { return nullptr; }
   virtual bool subscribe() = 0;
   virtual bool fetch(const Range& range, Sample* output, size_t capacity) = 0;
   virtual void wait(uint32_t milliseconds) = 0;

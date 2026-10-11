@@ -47,7 +47,11 @@ class NimbleTransport : public ctek::Transport {
 
   bool unlock(const std::array<uint8_t, 32>& input) override {
     auto* characteristic = service_->getCharacteristic(ctek::kUnlock);
-    if (!characteristic || !characteristic->canWrite()) return false;
+    if (!characteristic || !characteristic->canWrite()) {
+      appendLog(report_, "unlock: leespunt %s; code niet verstuurd\n",
+                characteristic ? "biedt geen schrijftoegang" : "niet gevonden");
+      return false;
+    }
     MD5Builder md5; md5.begin();
     md5.add(const_cast<uint8_t*>(input.data()), input.size());
     md5.calculate();
@@ -55,14 +59,27 @@ class NimbleTransport : public ctek::Transport {
     bool ok = characteristic->writeValue(digest, sizeof(digest), true);
     memset(digest, 0, sizeof(digest));
     appendLog(report_, "unlock write: %s (code en hash worden niet gelogd)\n", ok ? "OK" : "mislukt");
+    if (ok) appendLog(report_, "Ontgrendelbericht verstuurd; code nog niet bevestigd\n");
     return ok;
   }
 
   bool read(const char* uuid, uint8_t* output, size_t capacity, size_t& length) override {
     length = 0;
+    readError_ = nullptr;
+    if (!client_->isConnected()) {
+      readError_ = "Bluetooth-verbinding verbroken voor uitlezen; zie BLE-log";
+      appendLog(report_, "read %s: verbinding verbroken\n", uuid);
+      return false;
+    }
     auto* characteristic = service_->getCharacteristic(uuid);
-    if (!characteristic || !characteristic->canRead()) {
-      appendLog(report_, "read %s: ontbreekt of niet leesbaar\n", uuid);
+    if (!characteristic) {
+      readError_ = "Bluetooth-leespunt niet gevonden; zie BLE-log";
+      appendLog(report_, "read %s: leespunt niet gevonden; connected=%u\n", uuid, client_->isConnected());
+      return false;
+    }
+    if (!characteristic->canRead()) {
+      readError_ = "Bluetooth-leespunt biedt geen leestoegang; zie BLE-log";
+      appendLog(report_, "read %s: leespunt gevonden, maar read=0\n", uuid);
       return false;
     }
     time_t completedAt = -1;
@@ -72,7 +89,16 @@ class NimbleTransport : public ctek::Transport {
     appendLog(report_, "read %s: len=%u completed=%u raw=", uuid, unsigned(value.size()), completedAt != -1);
     for (size_t i = 0; i < value.size() && i < 20; ++i) appendLog(report_, "%02X ", value[i]);
     appendLog(report_, "\n");
-    if (completedAt == -1 || !value.size() || value.size() > capacity) return false;
+    if (completedAt == -1) {
+      readError_ = "Bluetooth-read mislukt; controleer code, bereik en telefoon; zie BLE-log";
+      appendLog(report_, "read niet voltooid; connected=%u (verbindingsstatus is geen GATT-readstatus)\n",
+                client_->isConnected());
+      return false;
+    }
+    if (!value.size() || value.size() > capacity) {
+      readError_ = "Bluetooth-read gaf een ongeldige lengte; zie BLE-log";
+      return false;
+    }
     length = value.size();
     memcpy(output, value.data(), length);
     if (!strcmp(uuid, ctek::kCursor) || !strcmp(uuid, ctek::kLiveVoltage)) {
@@ -81,6 +107,7 @@ class NimbleTransport : public ctek::Transport {
     }
     return true;
   }
+  const char* readError() const override { return readError_; }
 
   bool subscribe() override {
     auto* samples = service_->getCharacteristic(ctek::kSamples);
@@ -129,6 +156,7 @@ class NimbleTransport : public ctek::Transport {
   NimBLEClient* client_;
   NimBLERemoteService* service_;
   BleReport& report_;
+  const char* readError_ = nullptr;
 };
 
 void scan(BleReport& report) {
@@ -168,15 +196,26 @@ void readSensor(const BleJob& job, BleReport& report) {
       report.result.error = "Verbonden, maar CTEK-service ontbreekt";
       for (auto* found : client->getServices()) appendLog(report, "gevonden service: %s\n", found->getUUID().toString().c_str());
     } else {
-      for (auto* characteristic : service->getCharacteristics()) {
+      // NimBLE 2.x defaults to cache-only access. Explicitly discover all points
+      // before using UUID lookups, and include the sensor's read/write properties.
+      const auto& characteristics = service->getCharacteristics(true);
+      appendLog(report, "GATT-discovery: %u punten; connected=%u\n",
+                unsigned(characteristics.size()), client->isConnected());
+      for (auto* characteristic : characteristics) {
         appendLog(report, "GATT %s read=%u write=%u notify=%u\n",
                   characteristic->getUUID().toString().c_str(), characteristic->canRead(),
                   characteristic->canWrite(), characteristic->canNotify());
       }
-      NimbleTransport transport(client, service, report);
-      report.result = ctek::runSession(transport, job.code, job.previousValid ? &job.previous : nullptr);
+      if (characteristics.empty()) {
+        report.result.error = "CTEK-leespunten niet gevonden; code niet verstuurd; zie BLE-log";
+      } else {
+        NimbleTransport transport(client, service, report);
+        report.result = ctek::runSession(transport, job.code, job.previousValid ? &job.previous : nullptr);
+      }
     }
-  } else { report.result.error = "BLE-verbinding mislukt; controleer bereik, adrestype en telefoon"; }
+  } else {
+    report.result.error = "BLE-verbinding mislukt; code niet verstuurd; controleer bereik, adrestype en telefoon";
+  }
   portENTER_CRITICAL(&notificationMux);
   received.active = false;
   portEXIT_CRITICAL(&notificationMux);

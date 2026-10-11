@@ -45,7 +45,7 @@ void processReport() {
   state.lastAttempt = millis();  // Backoff starts after completion, including long GATT timeouts.
   state.status = report.result.error;
   state.log = report.log;
-  state.status += String(" (BLE-status ") + report.error + ")";
+  if (report.error != 0) state.status += String(" (BLE-verbindingsstatus ") + report.error + ")";
   if (report.result.success) {
     state.reading = report.result;
     state.readMs = report.readMs;
