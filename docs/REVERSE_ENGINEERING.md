@@ -2,7 +2,7 @@
 
 Datum: 11 oktober 2026. Doel: vier monitors met één ESP32-WROOM-32
 (ESP32-D0WD-V3 rev. 3, 40 MHz kristal, 4 MB flash), om de beurt uitlezen en via
-MQTT naar Home Assistant sturen. De fysieke sensoren zijn nog niet getest.
+MQTT naar Home Assistant sturen. Deze firmware is nog niet met fysieke sensoren getest.
 
 ## Onderzochte bestanden en methode
 
@@ -59,8 +59,10 @@ Geen hextekst schrijven: het resultaat zijn 16 binaire bytes.
 De codeprefix is `40149` (`resources/res/values/strings.xml:43`). De port
 accepteert 16 tekens of 11 met die prefix en weigert niet-ASCII-invoer.
 
-Dit is applicatie-authenticatie: in deze route geen OS-pincode, bonding of
-cloudtoken. Na de write wacht de app twee seconden (`M/b.java:442–467`) en leest
+Dit is applicatie-authenticatie: de onderzochte app-route vraagt geen handmatige
+OS-pincode of cloudtoken. Dat bewijst niet dat de Bluetooth-link onversleuteld
+blijft; zie het aanvullende praktijkbericht hieronder. Na de write wacht de app
+twee seconden (`M/b.java:442–467`) en leest
 de klok. Een geslaagde write alleen bewijst geen correcte code. De klok-read
 is de volgende bevestiging. Bij status 137 herhaalt de app de klok-read
 (`M/b.java:168–202`); de port begrenst dit om niet eindeloos vast te lopen.
@@ -134,6 +136,22 @@ Met één sensorverbinding tegelijk is geen vier-verbindingenconfiguratie nodig.
 Vier sensoren met enkele bytes per vijf minuten vragen weinig dataverkeer.
 De echte beperkingen zijn bereik, verbindingstijd, interferentie, voeding en
 sensorrevisie. Een telefoon kan de sensor bezet houden.
+
+Bij publicatie is ook [praktijkmelding #1 uit de oude repository](https://github.com/bbartje/ctek-ble-ESP32-gateway/issues/1)
+gelezen. De melder heeft één CTEK model 1088 uitgelezen met een ESP32-WROOM-32E
+en ESPHome/Bluedroid. Volgens die melding werken de gevonden MD5-ontgrendeling,
+temperatuurparser en historieaanvraag op echte hardware. De melder noemt een
+belangrijke volgorde: eerst unlock, daarna Bluetooth-versleuteling. Zonder
+versleuteling geeft de sensor bij bepaalde reads ATT-fout 0x0F.
+
+De meegebouwde NimBLE-Arduino 2.5.1 is hierop gecontroleerd:
+`src/NimBLERemoteValueAttribute.cpp:76–79,155–158` roept bij onvoldoende
+authenticatie of versleuteling automatisch `secureConnection()` aan en probeert
+de read/write opnieuw. Onze sessie schrijft de unlock vóór de eerste data-read.
+Daarmee is deze volgorde in de bestaande implementatie afgedekt; er is geen
+firmwarewijziging voor deze melding nodig. Het bericht is bewijs van de melder,
+geen fysieke test van onze binary of vier sensoren. Sensor-klok en volledige
+ringbuffer waren volgens de melder nog niet getest.
 
 Primaire bronnen:
 

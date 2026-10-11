@@ -2,8 +2,10 @@
 
 Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.1**.
 
-[Download het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.1.zip)
+[Download het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.1/ctek-esp32-wroom-32-0.2.0-beta.1.zip)
 en volg de [installatiehandleiding](docs/FLASHEN.md).
+De [bètarelease 0.2.0-beta.1](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.1)
+bevat ook de losse flashbestanden, controlesommen en bouwgegevens.
 
 ## Wat doet deze app?
 
@@ -22,6 +24,11 @@ De Android-app draait niet als APK op een ESP32: de benodigde communicatie wordt
 in C++ uitgevoerd. Zie [het onderzoeksrapport](docs/REVERSE_ENGINEERING.md) voor
 de analyse van de meegeleverde CTEK Battery Sense 2.4.6 XAPK en de bestaande
 [firmware-repository](https://github.com/bbartje/ctek-ble-ESP32-gateway).
+
+Deze repository is de plek voor verdere ontwikkeling en releases. De oude
+firmware-repository is gearchiveerd en blijft beschikbaar als historische bron,
+inclusief eerdere commits, releases en praktijkmeldingen. De nieuwe firmware
+heeft die repository niet nodig om te bouwen of te draaien.
 
 ## Hoe start je de app?
 
