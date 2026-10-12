@@ -1,127 +1,151 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.5**.
+Owner and maintainer: **bbartje**. Firmware version: **0.2.0-beta.6**.
 
-[Download de wifi-update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-ota.bin),
-[de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-factory.bin)
-of [het flashpakket (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.5.zip)
-en volg de [installatiehandleiding](docs/FLASHEN.md).
-De nieuwe bestanden staan in de repository, met controlesommen en bouwgegevens.
-De [eerdere bètarelease 0.2.0-beta.3](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
-blijft beschikbaar.
+[Download the Wi-Fi update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin),
+[the complete factory image (.bin, flash address 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-factory.bin),
+or [the firmware package (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.6.zip),
+then follow the [installation guide](docs/FLASHEN.md). The repository includes
+the release files, checksums, and build information. Earlier beta releases remain
+available in the repository.
 
-Beta.5 stelt via MQTT Discovery de standaardweergave in Home Assistant in:
-**spanning met twee decimalen**, beide temperaturen met één decimaal en
-signaalsterkte als geheel getal. De verstuurde meetwaarden behouden hun
-volledige precisie. Een eigen decimaalinstelling in Home Assistant blijft
-voorgaan. Na de wifi-update worden de sensorinstellingen opnieuw verstuurd.
-De Bluetooth-diagnose uit beta.4 blijft beschikbaar.
-Op 12 oktober 2026 is met beta.4 voor **plek 3 de eerste volledige fysieke
-uitlezing bevestigd**: verbinden, ontgrendelen, metadata lezen en twee
-historierecords ontvangen slagen. De beheerpagina toont spanning en temperatuur.
-Daarmee is de opgeslagen code voor deze sensor bevestigd. De gebruiker meldt
-ook spanning en temperatuur in Home Assistant. Herhaald uitlezen, de overige
-plekken en de nieuwe standaardweergave van beta.5 moeten nog worden bevestigd.
-Zie [de releasenotities](docs/RELEASE_0.2.0-beta.5.md)
-en [de opgeslagen teststatus en vervolgstappen](docs/VERVOLGTEST.md).
+Beta.6 publishes **live voltage**, **current temperature**, and the low-voltage
+status to Home Assistant. Historical measurements remain available on the
+gateway's history topic, but are no longer separate Home Assistant sensor
+entities. The device is identified as **BartjeB**. The web interface supports
+Dutch, English, and German, remembers the selected language, and displays the
+last successful read in the selected local time zone. A two-minute recovery
+access point is available after startup; existing settings are not erased.
+The public recovery login works only on that setup network and only to choose
+a new admin password. It cannot open configuration, diagnostics, or firmware
+uploads. Anyone nearby during the window can still reset the password; use
+recovery in a private setting. Normal network access always requires your own
+admin password.
 
-**PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de
-eerste factory-flash verbind je met `CTEK-Setup-xxxxxx`, met startwachtwoord
-**CTEK-Start123**. Open **http://192.168.4.1**, log in als **admin** met hetzelfde
-startwachtwoord en kies verplicht een eigen wachtwoord. Daarna herstart het
-bord; verbind en log opnieuw in met je nieuwe wachtwoord. Pas dan kun je wifi,
-MQTT en sensoren instellen. Een update via wifi behoudt een bestaand eigen
-beheerwachtwoord; de factory-flash wist de eerdere instellingen.
+**Release stage:** beta.6 is the candidate for the owner's final hardware test.
+Use the [acceptance checklist](docs/ACCEPTATIETEST.md) before inviting external
+testers. Keep the beta label during external testing; release 1.0.0 only after
+installation, repeated reads, Home Assistant, recovery, and updates have passed
+on testers' own devices.
 
-## Wat doet deze app?
+On October 12, 2026, the first complete physical read was confirmed for **sensor
+slot 3 on beta.4**: connection, unlock, metadata reads, and receipt of two history
+records all succeeded. The admin page displayed voltage and temperature, and
+this confirmed the saved code for that sensor. Voltage and temperature were
+also reported in Home Assistant. Repeated reads, the other sensor slots, and
+beta.6 behavior still need physical confirmation. See the [release notes](docs/RELEASE_0.2.0-beta.6.md)
+and [test status and next steps](docs/VERVOLGTEST.md).
 
-Een gateway voor maximaal vier CTEK Battery Sense-units, om de beurt uitgelezen
-met één ESP32-WROOM-32 (ESP32-D0WD-V3, 4 MB flash). Metingen gaan via wifi en MQTT
-naar de eigen Home Assistant. De protocolkern staat in `firmware/`.
+**PlatformIO and PuTTY are not required to install this firmware.** For the
+first factory flash, connect to `CTEK-Setup-xxxxxx` with the initial password
+**CTEK-Start123**. Open **http://192.168.4.1**, sign in as **admin** with the same
+initial password, and choose a personal password. The board restarts; reconnect
+and sign in with your new password. You can then configure Wi-Fi, MQTT, and
+sensors. A Wi-Fi update preserves your existing admin password; a factory flash
+erases the previous settings.
 
-De gateway biedt spanning, historische en actuele temperatuur, Bluetooth-
-signaalsterkte en een instelbare melding voor lage spanning. Home Assistant
-ontdekt de sensoren automatisch met MQTT Discovery. Iedere sensor wordt
-standaard eens per vijf minuten uitgelezen; na 30 minuten vervallen oude
-metingen. Een sensor buiten bereik verhindert het uitlezen van de andere niet.
-De configuratiepagina op het bord biedt logs en updates via wifi (OTA).
+## Update an Existing Gateway (OTA)
 
-De Android-app draait niet als APK op een ESP32: de benodigde communicatie wordt
-in C++ uitgevoerd. Zie [het onderzoeksrapport](docs/REVERSE_ENGINEERING.md) voor
-de analyse van de meegeleverde CTEK Battery Sense 2.4.6 XAPK en de bestaande
-[firmware-repository](https://github.com/bbartje/ctek-ble-ESP32-gateway).
+Download the [beta.6 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin).
+On the gateway page, choose **Pause polling and update firmware**, wait for any
+active sensor read to finish, then upload `ctek-esp32-wroom-32-ota.bin`. Keep
+the ESP32 powered until it restarts. Wi-Fi/MQTT settings, sensor configuration,
+and your admin password are preserved. Do not upload the factory image through
+this page. See [the complete OTA instructions](docs/FLASHEN.md#5-update-firmware-over-wi-fi)
+for update checks, recovery, and troubleshooting.
 
-Deze repository is de plek voor verdere ontwikkeling en releases. De oude
-firmware-repository is gearchiveerd en blijft beschikbaar als historische bron,
-inclusief eerdere commits, releases en praktijkmeldingen. De nieuwe firmware
-heeft die repository niet nodig om te bouwen of te draaien.
+## What Does This Project Do?
 
-## Hoe start je de app?
+A gateway for up to four CTEK Battery Sense units. One ESP32-WROOM-32
+(ESP32-D0WD-V3, 4 MB flash) reads them in turn and sends measurements over Wi-Fi
+and MQTT to your Home Assistant instance. The protocol implementation is in
+`firmware/`.
 
-In een Codespace start de app vanzelf. Zelf starten in een terminal:
+The gateway provides live voltage, current temperature, and a configurable
+low-voltage warning. Historical records remain available on the gateway's MQTT
+history topic. Home Assistant discovers the live sensors automatically through
+MQTT Discovery. By default, each sensor is read every five minutes; readings
+expire after 30 minutes. An out-of-range sensor does not prevent the others from
+being read. The board's configuration page provides collapsed BLE logs and
+over-the-air (OTA) updates.
+
+The Android app does not run as an APK on the ESP32; the required communication
+is implemented in C++. See the [reverse-engineering report](docs/REVERSE_ENGINEERING.md)
+for analysis of the supplied CTEK Battery Sense 2.4.6 XAPK and the original
+[firmware repository](https://github.com/bbartje/ctek-ble-ESP32-gateway).
+
+This repository is the home for ongoing development and releases. The original
+firmware repository is archived and remains available as a historical source,
+including earlier commits, releases, and field reports. The new firmware does
+not depend on it to build or run.
+
+## Run the Workshop App
+
+The app starts automatically in a Codespace. To start it yourself in a terminal:
 
 ```bash
 npm install
 npm start
 ```
 
-De React-workshopapp draait dan op poort 3000; dit is niet de configuratiepagina
-van de ESP32. Tests uitvoeren doe je met `npm test`; bouwen met `npm run build`.
-De tests voeren ook de echte C++-protocolkern uit met geheugencontroles.
-Daarvoor zijn Python 3 en `g++` nodig. Er worden geen fysieke sensoren benaderd.
+The React workshop app runs on port 3000; it is not the ESP32 configuration page.
+Run tests with `npm test` and build with `npm run build`. Tests also run the
+production C++ protocol code with memory checks. Python 3 and `g++` are required;
+the tests do not connect to physical sensors. Browser tests also exercise the
+ESP32 interface's language selection and sensor-slot controls.
 
-Firmware bouwen (PlatformIO Core 6.1.19 nodig):
+Build the firmware (requires PlatformIO Core 6.1.19):
 
 ```sh
 pio run --project-dir firmware -e esp32-wroom-32
 ```
 
-Een compleet flashpakket opnieuw maken en controleren:
+Build and validate the complete flash package:
 
 ```sh
 python3 firmware/tools/build_release.py
 npm test
 ```
 
-Het pakket bevat een manifest, SHA-256-controlesommen en de handleiding. De tests
-controleren ook corrupte bestanden en of de huidige firmwarebronnen overeenkomen
-met het geleverde pakket. GitHub Actions bouwt en controleert eveneens het pakket
-bij firmwarewijzigingen; de uitvoer staat onder de tab **Actions**.
+The package includes a manifest, SHA-256 checksums, and the installation guide.
+Tests also check corrupted files and whether the supplied package matches the
+current firmware sources. GitHub Actions builds and validates the package after
+firmware changes; see the **Actions** tab for its output.
 
-Gebruik de [flash- en installatiehandleiding](docs/FLASHEN.md) voor het Windows
-ESP32 Flash Download Tool. De complete factory-bin hoort op **0x0**; de losse
-applicatie-bin is voor updates via de gatewaypagina. Wissel die bestanden niet om.
+For USB installation, use the Windows [Espressif Flash Download Tool](https://www.espressif.com/en/support/download/other-tools)
+and follow the [flashing and installation guide](docs/FLASHEN.md). Flash the
+complete factory image at **0x0**. The application-only image is for updates
+through the gateway page; do not interchange these files.
 
-**Bèta:** de protocol- en foutscenario's worden op de computer getest en de
-echte ESP32-firmware wordt gebouwd. Er is geen fysiek bord/sensor beschikbaar
-in deze omgeving. Eén test met jouw sensoren en hun bereik blijft noodzakelijk.
-Een identiek CTEK-laadpercentage en volledige import van drie maanden historie
-zitten niet in deze versie; zie het onderzoeksrapport.
+**Beta status:** protocol and error scenarios are tested on a computer, and the
+ESP32 firmware is built. No physical board or sensor is available in this
+development environment. Testing with your sensors and their actual range is
+still required. This version does not provide CTEK's calculated state of charge
+or a complete three-month history import; see the reverse-engineering report.
 
-## Gegevens
+## Data and Privacy
 
-Batterijspanning, temperatuur, sensoradressen en meettijden. Wifi-/MQTT-wachtwoorden
-en verbindingscodes worden op het bord ingesteld en horen nooit in Git.
-De ESP32 bewaart instellingen lokaal; Home Assistant bewaart de metingen volgens
-de eigen instellingen. Er is geen CTEK-cloudaccount nodig voor het gevonden protocol.
-Het bekende startwachtwoord werkt alleen tijdens de eerste setup; de webpagina
-blokkeert normaal beheer totdat je een eigen wachtwoord hebt opgeslagen.
-Daarna is dit eigen wachtwoord ook het setupwifi-wachtwoord. Instellingen staan
-in het niet-versleutelde NVS-
-flashgeheugen en worden bij OTA behouden. De verbindingen zijn HTTP en MQTT
-zonder TLS; gebruik het eigen vertrouwde netwerk. Tijdsynchronisatie gebruikt
-`pool.ntp.org` en `time.cloudflare.com`. Bij ontbreken van tijd worden geen
-verzonnen kalenderdatums gepubliceerd.
-Voertuignamen, adressen en meetpatronen kunnen privégegevens worden wanneer je
-ze deelt; gebruik fictieve namen in gedeelde logs.
+The project handles battery voltage, temperature, sensor addresses, and
+measurement times. Configure Wi-Fi/MQTT passwords and sensor codes on the board;
+never add them to Git. The ESP32 stores settings locally. Home Assistant stores
+measurements according to its own configuration. The protocol does not require
+a CTEK cloud account. Battery data goes to your own MQTT broker; time
+synchronization contacts `pool.ntp.org` and `time.cloudflare.com`, without
+sending battery measurements. Vehicle names, addresses, and measurement patterns may be
+private data; use fictional names in shared logs.
 
-De XAPK en merknaam zijn van hun respectieve rechthebbenden. Gedecompileerde
-Android-bronbestanden worden niet opnieuw gepubliceerd. De gebruikte
-bibliotheken houden hun eigen licenties.
+HTTP, MQTT, and configuration storage are unencrypted. Use a trusted home
+network and do not expose the gateway or broker directly to the internet. Each
+tester manages their own gateway and Home Assistant backups. Keep sensor codes
+and network credentials privately so a factory reset can be configured again.
 
-Zie [technische informatie](firmware/README.md) voor onderwerpen, historiegrenzen,
-bibliotheken en wat nog op hardware moet worden bevestigd.
+The XAPK and brand name belong to their respective rights holders. Decompiled
+Android source files are not redistributed. Third-party libraries retain their
+own licenses.
 
-## Eigenaar
+See the [technical firmware documentation](firmware/README.md) for MQTT topics,
+history limits, dependencies, and items that still require hardware testing.
 
-**bbartje** is eigenaar, aanspreekpunt en beheerder van dit persoonlijke project.
+## Owner
+
+**bbartje** owns, maintains, and is the point of contact for this personal project.

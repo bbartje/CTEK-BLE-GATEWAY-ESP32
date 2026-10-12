@@ -1,166 +1,208 @@
-# Flashen en instellen zonder PlatformIO of PuTTY
+# Flash and Set Up the Gateway Without PlatformIO or PuTTY
 
-Voor jouw **ESP32-WROOM-32, ESP32-D0WD-V3 rev. 3, 4 MB flash**.
-Firmware **0.2.0-beta.5** is een softwarematig gecontroleerde bèta; een
-test met jouw echte Battery Sense-units blijft nodig. Voor C3/S3/S2 is dit
-bestand ongeschikt.
+For **ESP32-WROOM-32, ESP32-D0WD-V3 revision 3, with 4 MB flash** only.
+Firmware **0.2.0-beta.6** has passed software checks, but still needs testing
+with your physical Battery Sense units. This image is not for ESP32-C3/S3/S2.
 
-## 1. Eerste flash met ESP32 Flash Download Tool
+## 1. First Flash with the ESP32 Flash Download Tool
 
-[Download direct de volledige .bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-factory.bin),
-of pak de ZIP uit `firmware/releases/` uit. Gebruik voor USB het bestand
-**ctek-esp32-wroom-32-factory.bin**. PlatformIO is niet nodig om te flashen.
+Download the official [Espressif Flash Download Tool](https://www.espressif.com/en/support/download/other-tools).
+Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-factory.bin)
+or extract the ZIP from `firmware/releases/`. For USB installation, use
+**ctek-esp32-wroom-32-factory.bin**. PlatformIO is not needed to flash it.
 
-1. Sluit het bord met een USB-datakabel aan. Kies in het Espressif-programma
-   **ChipType ESP32**, **WorkMode Develop**, **LoadMode UART**.
-2. Selecteer het factory-bestand, vink uitsluitend deze rij aan en vul het
-   adres **0x0** in. Ook `0x00000000` is goed.
-3. Kies **DIO**, **40 MHz**, **32 Mbit / 4 MB** waar deze velden beschikbaar zijn.
-   Kies **DoNotChgBin** zodat de gecontroleerde imageheader behouden blijft.
-   Recente versies nemen de instellingen uit de bin over.
-4. Selecteer jouw COM-poort; start met **115200 baud**. Klik **START**.
-   Als verbinden niet lukt: houd **BOOT** ingedrukt, tik kort **EN/RESET** aan,
-   start en laat BOOT los zodra het downloaden begint.
-5. Wacht op **FINISH** en reset het bord. Deze factory-flash schrijft ook de
-   configuratiezone leeg; gebruik hem voor de eerste installatie of herstel.
-   Erase is normaal niet nodig en wist alle oude configuratie.
+1. Connect the board with a USB data cable. In Espressif's tool, select
+   **ChipType ESP32**, **WorkMode Develop**, and **LoadMode UART**.
+2. Select the factory image, enable only that row, and enter address **0x0**.
+   **0x00000000** is also valid.
+3. Where available, select **DIO**, **40 MHz**, and **32 Mbit / 4 MB**. Choose
+   **DoNotChgBin** to preserve the validated image header. Recent tool versions
+   read these settings from the image.
+4. Select your COM port and start at **115200 baud**. Click **START**. If the
+   connection fails, hold **BOOT**, briefly press **EN/RESET**, start the
+   download, then release BOOT when flashing begins.
+5. Wait for **FINISH** and reset the board. A factory flash also erases the
+   configuration area, so use it for first installation or recovery. An erase
+   is normally unnecessary and will remove all existing configuration.
 
-De factory-bin bevat bootloader op 0x1000, partitietabel op 0x8000,
-OTA-startdata op 0xE000 en app op 0x10000. Die zijn al samengevoegd; laad geen
-extra rijen naast het factory-bestand. Een losse applicatie-bin op 0x0 is fout.
+The factory image already combines the bootloader at 0x1000, partition table at
+0x8000, OTA start data at 0xE000, and application at 0x10000. Do not add separate
+rows alongside the factory image. Flashing an application-only image at 0x0 is
+incorrect.
 
-## 2. Configureer via wifi; PuTTY is niet nodig
+## 2. Configure over Wi-Fi; PuTTY Is Not Needed
 
-Na een factory-flash van deze versie zijn de eerste inloggegevens:
+After a factory flash of this version, the initial login details are:
 
-| Gegeven | Waarde |
+| Item | Value |
 |---|---|
-| Wifi-netwerk | `CTEK-Setup-xxxxxx` |
-| Startwachtwoord wifi | **CTEK-Start123** |
-| Configuratieadres | **http://192.168.4.1** |
-| Gebruiker | **admin** |
-| Startwachtwoord beheer | **CTEK-Start123** |
+| Wi-Fi network | `CTEK-Setup-xxxxxx` |
+| Initial Wi-Fi password | **CTEK-Start123** |
+| Configuration address | **http://192.168.4.1** |
+| Username | **admin** |
+| Initial admin password | **CTEK-Start123** |
 
-1. Laat het bord van stroom voorzien en druk na de flash op EN/RESET.
-2. Verbind je telefoon/laptop met `CTEK-Setup-xxxxxx`, met wachtwoord
-   **CTEK-Start123**. Je telefoon kan dit netwerk zonder internet willen
-   verlaten; kies om ermee verbonden te blijven.
-3. Open **http://192.168.4.1**. Als de browser om inloggen vraagt: gebruiker
-   **admin**, wachtwoord **CTEK-Start123**.
-4. Je ziet **Kies eerst je eigen wachtwoord**. Kies 12–63 tekens: letters,
-   cijfers en gewone leestekens, zonder spaties of accenten. Vul het twee keer
-   in en sla op. Het startwachtwoord mag niet als eigen wachtwoord worden gebruikt.
-   Wifi/MQTT, sensoren en firmware-upload blijven tot deze stap geblokkeerd.
-5. Het bord herstart en het setupnetwerk verdwijnt even. Verbind daarna met
-   hetzelfde `CTEK-Setup-xxxxxx`, maar met **je nieuwe wachtwoord**. Als je
-   telefoon/laptop nog het startwachtwoord gebruikt: vergeet het netwerk in de
-   wifi-instellingen en verbind opnieuw.
-6. Open opnieuw **http://192.168.4.1** en log in als **admin** met je nieuwe
-   wachtwoord. Ook de browser kan nog de oude login onthouden en opnieuw om
-   de juiste gegevens vragen. Bewaar je eigen wachtwoord privé.
-7. Vul de **2,4 GHz-wifi** en jouw bestaande MQTT-broker in. De broker is het
-   adres van bijvoorbeeld de Mosquitto-add-on, niet een URL van Home Assistant.
-   Vul de MQTT-gebruikersnaam/wachtwoord in; laat poort 1883 staan als dat bij
-   jouw broker hoort. Sla op. De gateway herstart.
-8. Verbind de laptop weer met je gewone netwerk. Open `http://ctek-xxxxxx.local`
-   als jouw netwerk dit ondersteunt (`xxxxxx` is dezelfde suffix als bij setup).
-   Anders vind je het IP-adres in de lijst met verbonden apparaten van je router;
-   de apparaatnaam is `ctek-xxxxxx`. Reserveer bij voorkeur dit IP in de router.
-   Als wifi niet lukt, komt het setupnetwerk na circa één minuut terug, met
-   **je eigen wachtwoord**.
+1. Keep the board powered and press EN/RESET after flashing.
+2. Connect your phone or laptop to `CTEK-Setup-xxxxxx` with password
+   **CTEK-Start123**. Your phone may try to leave the network because it has no
+   internet access; choose to stay connected.
+3. Open **http://192.168.4.1**. If prompted, sign in as **admin** with
+   **CTEK-Start123**.
+4. Select **Choose your own password first**. Choose 12–63 characters using
+   letters, numbers, and ordinary punctuation, without spaces or accents. Enter
+   it twice and save. Do not use the initial password as your own. Wi-Fi, MQTT,
+   sensors, and firmware upload remain blocked until this step is complete.
+5. The board restarts and the setup network briefly disappears. Reconnect to
+   `CTEK-Setup-xxxxxx` using **your new password**. If your phone or laptop still
+   uses the initial password, forget the network in its Wi-Fi settings and
+   connect again.
+6. Open **http://192.168.4.1** again and sign in as **admin** with your new
+   password. Your browser may still remember the old login and ask you to enter
+   the correct credentials again. Keep your password private.
+7. Enter your **2.4 GHz Wi-Fi** details and existing MQTT broker. Use the broker
+   address, such as that of a Mosquitto add-on, not a Home Assistant URL. Enter
+   the MQTT username and password; keep port 1883 if that matches your broker.
+   Choose your local time zone in the same form. The default is Europe/Amsterdam;
+   the listed regions apply daylight-saving changes automatically. Save the settings.
+   The gateway restarts.
+8. Reconnect your laptop to your regular network. Open `http://ctek-xxxxxx.local`
+   if your network supports it (`xxxxxx` is the same suffix as the setup network).
+   Otherwise, find the device's IP address in your router's connected-device list;
+   its name is `ctek-xxxxxx`. Reserving this IP in the router is recommended. If
+   Wi-Fi does not connect, the setup network returns after about one minute,
+   using **your own password**.
 
-Bij een OTA-update vanuit een eerdere versie blijft je bestaande eigen
-beheerwachtwoord behouden; het startwachtwoord wordt dan niet opnieuw ingesteld.
-Als je het oude wachtwoord niet kunt uitlezen, installeer deze nieuwe factory-bin
-op **0x0**. Dat wist de oude instellingen en begint met de bovenstaande stappen.
+On every boot with saved Wi-Fi settings, the gateway also opens `CTEK-Setup-xxxxxx`
+for a **two-minute recovery window**, using **CTEK-Start123**. Normal Wi-Fi,
+BLE polling, and MQTT startup continue immediately; this window does not reset
+or change saved settings. To recover a forgotten password:
 
-## 3. Eén sensor testen en daarna de andere drie toevoegen
+1. Restart the board and connect to `CTEK-Setup-xxxxxx` with the initial Wi-Fi
+   password within two minutes.
+2. Open **http://192.168.4.1**, sign in as **admin** with the initial password,
+   and enter your new admin password twice. This login only opens password
+   recovery; configuration, diagnostics, and firmware upload remain blocked.
+3. Save before the two-minute deadline. The board restarts with Wi-Fi, MQTT,
+   and sensors preserved. Reconnect to your normal network and sign in to the
+   gateway with the new admin password. If home Wi-Fi cannot connect, wait for
+   the private setup network to return after the recovery window ends.
 
-1. Sluit de CTEK-app volledig om een bestaande Bluetooth-verbinding vrij te
-   maken. Begin bij één sensor die dichtbij de ESP32 staat.
-2. Klik **Zoek Bluetooth-apparaten**, wacht zes seconden en vernieuw de pagina.
-   Kopieer het adres en het adrestype naar plek 1. De scan noemt kandidaten;
-   de echte CTEK-service wordt tijdens verbinden gecontroleerd.
-3. Geef een naam en de code van het sensorlabel: 16 tekens, of de 11 tekens
-   zonder prefix `40149`. Sla op. Een verkeerde code kun je op de webpagina
-   corrigeren; daar is geen reflash voor nodig.
-4. Vernieuw na 15–60 seconden. Bij een gezonde verbinding zie je spanning,
-   temperatuur en **Meting ontvangen**. Een nieuwe sensor zonder historie
-   gebruikt live spanning. Vergelijk bij een stilstaande accu de spanning met
-   de CTEK-app of een multimeter; sluit de app daarna weer.
-5. Controleer in Home Assistant dat de MQTT-integratie actief is. Onder
-   **Instellingen → Apparaten en diensten → MQTT** verschijnt de sensor met
-   spanning, twee temperaturen, signaalsterkte en **Lage spanning**. De twee
-   temperaturen horen bij verschillende momenten en mogen verschillen.
-   De standaardweergave is twee decimalen voor spanning en één voor temperatuur.
-   Een eerder handmatig gekozen aantal decimalen in Home Assistant blijft gelden.
-6. Voeg sensoren 2–4 toe. Controleer over minstens twee uitleesrondes dat elke
-   sensor meer dan één geslaagde uitlezing krijgt. De standaardronde is eens
-   per vijf minuten per sensor, geen vier blijvend open verbindingen.
+The initial password is rejected on the normal network. The public recovery
+login closes after two minutes even if a device is still connected.
+If the saved Wi-Fi is still unavailable later, the existing setup access point
+may return using your private admin password. The initial first-time password
+setup remains available until you choose a private password. Because the
+recovery password is public, anyone nearby during the window can reset the
+admin password. Perform setup and recovery in a private setting. HTTP and MQTT
+are unencrypted; keep the gateway on a trusted home network, without internet
+port forwarding. Keep your sensor codes and network credentials privately, and
+back up Home Assistant before testing updates.
 
-Een fout geeft geen nulmeting. De oude waarde wordt na 30 minuten onbeschikbaar.
-Gebruik **Nu uitlezen** voor een nieuwe poging. **Diagnostics downloaden**
-bevat stappen en ruwe meetmetadata, geen codes/wachtwoorden. Verwijder wel
-sensoradressen vóór openbaar delen. USB is voor deze controles niet meer nodig.
+An OTA update from an earlier version preserves your existing admin password;
+it does not restore the initial password. If you cannot recover your old
+password, install this new factory image at **0x0**. This erases the old settings
+and restarts the setup process above.
 
-## 4. Controle op de definitieve plek
+## 3. Test One Sensor, Then Add the Other Three
 
-Verplaats het bord pas nadat sensor 1 en MQTT werken. Test op de definitieve
-plek met motorkappen/garagedeuren in hun normale stand. Controleer wifi en alle
-vier BLE-signalen gedurende enkele rondes. Afstand alleen zegt weinig door
-metaal en interferentie. Houd een stabiele USB-voeding; dit project sluit de
-ESP32 niet rechtstreeks op 12 V aan.
+1. Fully close the CTEK app to release any existing Bluetooth connection. Start
+   with one sensor close to the ESP32.
+2. Click **Search for Bluetooth devices**, wait six seconds, and refresh the
+   page. Copy the address and address type to slot 1. The scan lists candidates;
+   the actual CTEK service is verified when connecting.
+3. Enter a name and the code from the sensor label: 16 characters, or the 11
+   characters without the `40149` prefix. Save. You can correct an invalid code
+   on the web page; no reflash is needed.
+4. Refresh after 15–60 seconds. A successful connection shows voltage,
+   temperature, and **Reading received**. A new sensor without history uses live
+   voltage. With the vehicle stationary, compare voltage with the CTEK app or a
+   multimeter, then close the app again.
+5. Confirm the MQTT integration is active in Home Assistant. Under
+   **Settings → Devices & services → MQTT**, the device should appear with live
+   voltage, current temperature, and **Low voltage** status. Home Assistant
+   stores its own history from these live updates. The default display uses two
+   decimal places for voltage and one for temperature. A precision setting you
+   chose manually in Home Assistant takes precedence.
+6. Save the first sensor, then use the **+** control to reveal another slot.
+   Add sensors 2–4 one at a time. Over at least two polling rounds, confirm that each sensor
+   has more than one successful read. The default interval is five minutes per
+   sensor; the ESP32 does not keep four connections open continuously.
 
-Voer desgewenst één bereiktest uit: maak één sensor onbereikbaar en controleer
-dat de andere blijven verversen. Na 30 minuten moet die ene sensor
-onbeschikbaar worden. Breng hem terug en controleer herstel zonder herstart.
+A failure does not produce a zero reading. Old values become unavailable after
+30 minutes. Use **Read now** to request an earlier retry. **Download diagnostics**
+includes procedure details and raw measurement metadata, but no codes or
+passwords. Remove sensor addresses before sharing diagnostics publicly. USB is
+not needed for these checks.
 
-## 5. Volgende firmware via wifi
+## 4. Check the Final Installation Location
 
-Voor een update vanaf beta.1, beta.2, beta.3 of beta.4:
-[download de OTA-bin van beta.5](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-ota.bin).
+Move the board only after sensor 1 and MQTT work. At the final location, test
+with vehicle hoods or garage doors in their normal positions. Check Wi-Fi and
+all four BLE signals for several polling rounds. Distance alone is not a useful
+guide because metal and interference affect radio range. Use a stable USB power
+supply; this project does not connect the ESP32 directly to 12 V.
 
-1. Open de gatewaypagina en kies **Uitlezen pauzeren en firmware bijwerken**.
-   Wacht de actieve poging af en vernieuw de updatepagina.
-2. Kies alleen **ctek-esp32-wroom-32-ota.bin** uit het nieuwe pakket.
-   De factory-bin wordt hier geweigerd. Upload het bestand en houd de voeding aan.
-3. Na validatie herstart de gateway. Controleer versie, sensoren en geslaagde
-   metingen. Instellingen en wachtwoorden blijven behouden.
-4. Bij afgebroken/mislukte upload blijft de huidige firmware geselecteerd.
-   Bij **Annuleren** of na vijf minuten inactiviteit hervat het uitlezen.
+Optionally, make one sensor unreachable and confirm the others continue to
+update. After 30 minutes, that sensor should become unavailable. Bring it back
+within range and confirm that it recovers without restarting the board.
 
-Controleer na deze update dat de pagina **0.2.0-beta.5** meldt. De gateway
-verstuurt de sensorinstellingen opnieuw naar Home Assistant: spanning standaard
-met twee decimalen en beide temperaturen met één decimaal. Instellingen die je
-zelf in Home Assistant hebt gekozen gaan voor. De meetwaarden en bestaande
-sensoridentiteiten blijven behouden; opnieuw toevoegen is niet nodig.
+## 5. Update Firmware over Wi-Fi
 
-Klik bij een
-sensor **Nu uitlezen** en bekijk de **BLE-log**. Daar staat nu `GATT-discovery`
-met het aantal gevonden punten, gevolgd door de UUID's en hun mogelijkheden.
-Een punt dat ontbreekt, een punt met `read=0` en een echte readfout krijgen
-verschillende meldingen. `unlock write: OK` betekent dat het bericht is
-verstuurd; de code is dan nog niet bevestigd. Bij een verbindingsfout is de
-code helemaal niet verstuurd. Beta.4 voegt `BLE-disconnect` toe met de reden,
-uitleesstap en timing van een verbreking vóór het eigen opruimen. Deze reden
-bewijst op zichzelf niet dat de code onjuist is. Bij **Bezig met BLE-uitlezing**
-staat er nog de log van de vorige afgeronde poging: wacht tot de poging klaar
-is en vernieuw de pagina. Als uitlezen nog mislukt, download dan de nieuwe
-diagnostics en deel die zonder adressen of andere privégegevens.
+For an update from beta.1 through beta.5, [download the beta.6 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin).
 
-Een foutenloze upload bewijst niet dat een nieuwe programmalogica goed werkt.
-Er is geen automatische bootrollback; als een latere versie niet meer start
-of wifi niet meer werkt kan USB-herstel nodig blijven.
+1. Open the gateway page and select **Pause polling and update firmware**. Wait
+   for the active read to finish, then refresh the update page.
+2. Select only **ctek-esp32-wroom-32-ota.bin** from the new package. The factory
+   image is rejected here. Upload the file and keep the board powered.
+3. After validation, the gateway restarts. Check the version, sensors, and
+   successful readings. Settings and passwords are preserved.
+4. If an upload is cancelled or fails, the current firmware remains selected.
+   Polling resumes after **Cancel** or five minutes of inactivity.
 
-## 6. Waarschuwing in Home Assistant
+After the update, confirm the page reports **0.2.0-beta.6**. The gateway
+republishes Discovery: voltage defaults to two decimal places and current
+temperature to one. The `voltage`, `temperature`, and `low_voltage` entity IDs
+remain stable. The old separate `current_temperature` and Bluetooth RSSI
+entities are removed; the existing `temperature` entity now represents the
+current reading. Home Assistant continues recording its own history. The
+device manufacturer is shown as **BartjeB**. Your own display settings take
+precedence; you do not need to remove and re-add the device.
 
-Maak in **Instellingen → Automatiseringen** een automatisering voor het
-ontdekte **Lage spanning**-signaal. Bijvoorbeeld: status **aan** gedurende
-15 minuten → stuur een melding naar je telefoon. Kies je eigen drempel op de
-gateway; 12,2 V is alleen de startinstelling, geen universele accudiagnose.
-Maak daarnaast een melding wanneer een sensor langere tijd onbeschikbaar is.
-Zo kan ontbrekende data niet stilzwijgend als een gezonde accu worden behandeld.
+If a live voltage read is missing, its Home Assistant value and the low-voltage
+signal become **unknown**, rather than reporting a historical value as current.
+The gateway page labels any historical fallback explicitly. Treat unknown or
+unavailable data as missing information; it does not confirm a healthy battery.
 
-Deze versie levert geen exact CTEK-laadpercentage. De normale HA-grafiek begint
-bij de ontvangst van metingen; oude historie op `/history` wordt niet automatisch
-teruggeschreven in de grafiek. Meer uitleg: [firmware/README.md](../firmware/README.md).
+For a sensor, click **Read now** and inspect the **BLE log**. `GATT-discovery`
+shows the number of discovered characteristics, their UUIDs, and capabilities.
+A missing characteristic, one with `read=0`, and a failed read have different
+messages. `unlock write: OK` means only that the message was sent; it does not
+confirm the code. On a connection failure, the code was not sent. Beta.4 adds
+`BLE-disconnect` with the reason, read phase, and timing for a disconnect before
+cleanup. This reason alone does not prove the code is wrong. While the status
+shows **BLE read in progress**, the log still belongs to the previous completed
+attempt; wait for the read to finish and refresh the page. If reads still fail,
+download the latest diagnostics and share them without addresses or other
+private information.
+
+A successful upload does not prove that new program logic works correctly.
+There is no automatic boot rollback. USB recovery may still be needed if a later
+version will not start or Wi-Fi stops working.
+
+## 6. Create a Home Assistant Warning
+
+In **Settings → Automations**, create an automation for the discovered
+**Low voltage** signal. For example, when its state is **on** for 15 minutes,
+send a notification to your phone. Choose your own gateway threshold; 12.2 V is
+only the initial setting, not a universal battery diagnosis. Also create a
+notification for a sensor that remains unavailable, so missing data is not
+mistaken for a healthy battery.
+
+This version does not provide an exact CTEK state-of-charge percentage. The
+standard Home Assistant graph starts when measurements are received; old records
+on `/history` are not automatically backfilled into the graph. See the
+[firmware documentation](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/blob/main/firmware/README.md) for more information.
+
+Before inviting external testers, complete the owner's
+[acceptance checklist](ACCEPTATIETEST.md). Keep beta.6 during external testing;
+version 1.0.0 follows successful testing on their own hardware and networks.

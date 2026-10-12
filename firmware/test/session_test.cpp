@@ -60,6 +60,7 @@ int main() {
   ScriptedTransport io;
   auto result = runSession(io, code, &previous);
   assert(result.success && result.count == 3 && !result.live);
+  assert(result.currentVoltageValid && result.currentVoltage == 12.5f);
   assert(result.currentTemperatureValid && result.currentTemperature == 20.5f);
   assert(result.samples[2].temperature == -10.5f);
   assert(io.operations[0] == "unlock" && io.operations[1] == "wait:2000");
@@ -102,9 +103,13 @@ int main() {
   ScriptedTransport noTemperature; noTemperature.temperatureOk = false;
   result = runSession(noTemperature, code, nullptr);
   assert(result.success && !result.currentTemperatureValid);
+  ScriptedTransport historyNoLive; historyNoLive.voltageOk = false;
+  result = runSession(historyNoLive, code, nullptr);
+  assert(result.success && !result.currentVoltageValid && result.count > 0);
   ScriptedTransport live; live.metadata = {30, 5, 0};
   result = runSession(live, code, nullptr);
-  assert(result.success && result.live && result.samples[0].voltage == 12.5f && live.requests.empty());
+  assert(result.success && result.live && result.currentVoltageValid && result.currentVoltage == 12.5f);
+  assert(result.samples[0].voltage == 12.5f && live.requests.empty());
   ScriptedTransport newborn; newborn.metadata = {6, 5, 0};
   assert(!runSession(newborn, code, nullptr).success);
   ScriptedTransport noLive; noLive.metadata = {30, 5, 0}; noLive.voltageOk = false;
@@ -116,6 +121,7 @@ int main() {
   ScriptedTransport optionalFailure; optionalFailure.metadata = {30, 5, 0}; optionalFailure.temperatureOk = false;
   optionalFailure.readFailure = "Bluetooth-leespunt niet gevonden; zie BLE-log";
   result = runSession(optionalFailure, code, nullptr);
-  assert(result.success && result.live && !result.currentTemperatureValid && optionalFailure.readError() == nullptr);
+  assert(result.success && result.live && result.currentVoltageValid && !result.currentTemperatureValid);
+  assert(optionalFailure.readError() == nullptr);
   std::cout << "Sessietests geslaagd: volgorde, unlockbevestiging, foutdetails, retries, historie en live-fallback.\n";
 }

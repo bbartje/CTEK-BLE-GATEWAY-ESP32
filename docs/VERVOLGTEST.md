@@ -4,8 +4,8 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
 ## Opgeslagen firmware
 
-- Nieuwste versie: **0.2.0-beta.5**, voor ESP32-WROOM-32 met 4 MB flash.
-  Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
+Nieuwste versie: **0.2.0-beta.6**, voor ESP32-WROOM-32 met 4 MB flash.
+Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 - De eerdere beta.3-firmware en flashbestanden zijn gecommit en gepusht in
   commit `8db6863f0194155364d02ce2601a1a3342cab8cb`.
 - [De publieke bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
@@ -13,8 +13,23 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 - [De OTA-bin voor een wifi-update](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-ota.bin?download=1)
   is 1.181.392 bytes. Grootte en SHA-256 van de publieke download zijn
   gecontroleerd tegen de lokale binary.
-- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.5/`; de ZIP staat
-  één map hoger. Zie [de releasenotities](RELEASE_0.2.0-beta.5.md).
+- De nieuwe bestanden staan na de gecontroleerde build in `firmware/releases/0.2.0-beta.6/`; de ZIP
+  staat één map hoger. Zie [de releasenotities](RELEASE_0.2.0-beta.6.md).
+
+Beta.6 voegt herstel-wifi voor twee minuten na opstart, Nederlands/Engels/Duits,
+een tijdzonekeuze, progressieve sensorplekken en live Home Assistant-waarden toe.
+De softwarelogica is niet hetzelfde als hardwarebewijs: de live BLE-punten,
+herhaald uitlezen, MQTT-ontvangst, herstel-login en OTA moeten op de ESP32 nog
+worden bevestigd.
+
+De kwaliteitscontrole heeft het herstelwachtwoord beperkt tot wachtwoordherstel
+via het setupnetwerk; instellingen, diagnostics en OTA vereisen het eigen
+wachtwoord. Ook zijn de tijdzone-overwrite, het verkeerd benoemen van
+historische spanning en de multipart-parserkwetsbaarheid gecorrigeerd.
+Gebruik [de acceptatietest](ACCEPTATIETEST.md) voor de laatste eigen test.
+Beta.6 blijft een testkandidaat; de volgende fase is een beperkte externe bèta,
+en pas daarna kan een stabiele 1.0.0 volgen. Er is nog geen nieuwe fysieke
+uitslag vastgelegd.
 
 Beta.3 zoekt alle GATT-punten daadwerkelijk op, logt hun mogelijkheden en
 maakt onderscheid tussen ontbrekende punten, ontbrekende leestoegang en
@@ -101,7 +116,7 @@ blijft voorgaan. De nieuwe Discovery-weergave moet nog fysiek worden getest.
 Deze notitie bevat geen echte sensoradressen, codes, wachtwoorden of ruwe
 persoonlijke logs. De eigen instellingen blijven op de ESP32 opgeslagen.
 
-## Hervatten vanavond, 12 oktober 2026
+## Historische beta.5-status
 
 De gebruiker wil vanavond verder testen met een andere sensor. Beta.5 is
 gecommit en naar GitHub gepusht in commit `5807d2a`; de publieke OTA-download
@@ -115,18 +130,20 @@ Beoordeel één afgeronde poging tegelijk. Noteer de sensorplek, firmwareversie,
 scan-signaalsterkte en het resultaat; deel geen codes of wachtwoorden.
 De werkende configuratie van plek 3 blijft het referentiepunt.
 
-## Eerstvolgende test: herhaald uitlezen en ontvangst controleren
+## Eerstvolgende test: beta.6 op hardware controleren
 
 1. Laat de huidige poging van plek 3 afronden en vernieuw de pagina.
    Controleer of **geslaagd** oploopt naar twee en de status **Meting ontvangen** is.
 2. Houd telefoon-Bluetooth uit en laat de ESP32 op dezelfde plek voor enkele
    automatische uitlezingen. Controleer of het aantal geslaagde pogingen verder
    oploopt. Noteer afstand en scan-signaalsterkte voor de werkende opstelling.
-3. Installeer beta.5 via de [wifi-updatehandleiding](FLASHEN.md#5-volgende-firmware-via-wifi).
-   Controleer dat Home Assistant de spanning en temperatuur bij volgende
-   uitlezingen blijft bijwerken, met twee decimalen voor spanning en één voor
-   temperatuur. Een eigen decimaalinstelling in Home Assistant gaat voor.
-4. Identificeer daarna de overige sensoren en sla per sensor de bijbehorende
+3. Installeer beta.6 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
+  Controleer live spanning en actuele temperatuur, de lage-spanningsstatus,
+  `BartjeB` bij apparaatinfo en het opruimen van de oude dubbele temperatuur-
+  en RSSI-entiteiten. Eigen Home Assistant-weergaveprecisie blijft leidend.
+4. Controleer dat de beheerpagina tijd in de gekozen lokale tijdzone toont en
+  dat Home Assistant updates blijft ontvangen na meerdere automatische rondes.
+5. Identificeer daarna de overige sensoren en sla per sensor de bijbehorende
    code op. Test ze één voor één vanuit een opstelling met voldoende ontvangst.
 
 ## Bij een volgende fout

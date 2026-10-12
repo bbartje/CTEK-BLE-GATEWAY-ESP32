@@ -1,5 +1,6 @@
 #include "gateway_types.h"
 #include "admin_access.h"
+#include "time_zone.h"
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
@@ -9,7 +10,9 @@
 namespace {
 Preferences preferences;
 bool apStarted = false, wasConnected = false;
+bool recoveryApActive = false;
 uint32_t lastReconnect = 0, disconnectedSince = 0;
+uint32_t recoveryApStartedAt = 0;
 String hostname;
 
 void openSetup() {
@@ -18,10 +21,20 @@ void openSetup() {
   apStarted = WiFi.softAP(setupSsid.c_str(), config.adminPassword.c_str(), 1, false, 1);
   Serial.printf("Setup-wifi: %s; adres http://192.168.4.1; WPA2-wachtwoord = beheerwachtwoord\n", setupSsid.c_str());
 }
+
+void openRecoverySetup() {
+  WiFi.mode(WIFI_AP_STA);
+  apStarted = WiFi.softAP(setupSsid.c_str(), ctek::kInitialAdminPassword, 1, false, 1);
+  recoveryApActive = apStarted;
+}
 }
 
 bool initialSetupPending() {
   return ctek::passwordChangeRequired(std::string_view(config.adminPassword.c_str(), config.adminPassword.length()));
+}
+
+bool recoveryAccessOpen() {
+  return recoveryApActive && ctek::recoveryCredentialWindowOpen(millis(), recoveryApStartedAt);
 }
 
 bool saveAdminPassword(const String& password) {
@@ -45,6 +58,8 @@ void loadConfiguration() {
   if (config.pollSeconds < 60 || config.pollSeconds > 900) config.pollSeconds = 300;
   config.lowVoltage = preferences.getFloat("low_v", 12.2f);
   if (!(config.lowVoltage >= 8 && config.lowVoltage <= 16)) config.lowVoltage = 12.2f;
+  config.timezone = preferences.getString("timezone", "Europe/Amsterdam");
+  if (!ctek::findTimeZone(config.timezone.c_str())) config.timezone = "Europe/Amsterdam";
   config.adminPassword = preferences.getString("admin_pw", "");
   if (!ctek::validAdminPassword(std::string_view(config.adminPassword.c_str(), config.adminPassword.length())))
     config.adminPassword = ctek::kInitialAdminPassword;
@@ -77,6 +92,7 @@ void saveConfiguration() {
   preferences.putString("mqtt_pw", config.mqttPassword);
   preferences.putUInt("poll_s", config.pollSeconds);
   preferences.putFloat("low_v", config.lowVoltage);
+  preferences.putString("timezone", config.timezone);
   preferences.putString("admin_pw", config.adminPassword);
 }
 void saveSensors() {
@@ -103,11 +119,13 @@ void startNetwork() {
   WiFi.setAutoReconnect(true);
   // Configuration is stored with Preferences; avoid writing Wi-Fi state on every retry.
   WiFi.persistent(false);
-  Serial.printf("Beheerlogin: admin; %swachtwoord: %s\n",
-                initialSetupPending() ? "eenmalig start" : "eigen ", config.adminPassword.c_str());
-  Serial.println("Bewaar dit wachtwoord lokaal; deel deze regel niet in diagnostics.");
+  Serial.println("Beheerlogin: admin; gebruik het startwachtwoord bij eerste installatie, anders je eigen wachtwoord.");
   if (initialSetupPending() || config.ssid.isEmpty()) openSetup();
-  else WiFi.begin(config.ssid.c_str(), config.wifiPassword.c_str());
+  else {
+    recoveryApStartedAt = millis();
+    openRecoverySetup();
+    WiFi.begin(config.ssid.c_str(), config.wifiPassword.c_str());
+  }
   disconnectedSince = lastReconnect = millis();
 }
 
@@ -116,13 +134,20 @@ void serviceNetwork() {
   // Saved station credentials may only be used after choosing a private password.
   if (initialSetupPending()) { openSetup(); return; }
   bool connected = WiFi.status() == WL_CONNECTED;
+  if (recoveryApActive && !recoveryAccessOpen()) {
+    WiFi.softAPdisconnect(true);
+    recoveryApActive = false;
+    apStarted = false;
+    if (connected) WiFi.mode(WIFI_STA);
+  }
   if (connected && !wasConnected) {
     Serial.printf("Wifi verbonden; configuratie http://%s of http://%s.local\n",
                   WiFi.localIP().toString().c_str(), hostname.c_str());
     MDNS.end();
     if (MDNS.begin(hostname.c_str())) MDNS.addService("http", "tcp", 80);
-    configTime(0, 0, "pool.ntp.org", "time.cloudflare.com");
-    if (apStarted) { WiFi.softAPdisconnect(true); WiFi.mode(WIFI_STA); apStarted = false; }
+    const auto* zone = ctek::findTimeZone(config.timezone.c_str());
+    configTzTime(zone ? zone->rule : "UTC0", "pool.ntp.org", "time.cloudflare.com");
+    if (apStarted && !recoveryApActive) { WiFi.softAPdisconnect(true); WiFi.mode(WIFI_STA); apStarted = false; }
   }
   if (!connected) {
     if (wasConnected) disconnectedSince = millis();

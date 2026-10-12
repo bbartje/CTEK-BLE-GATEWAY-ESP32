@@ -32,7 +32,7 @@ void deviceInfo(JsonDocument& doc, size_t slot) {
   auto device = doc["device"].to<JsonObject>();
   device["identifiers"].to<JsonArray>().add("ctek_" + gatewayIdentifier + "_" + id(slot));
   device["name"] = sensors[slot].name;
-  device["manufacturer"] = "CTEK";
+  device["manufacturer"] = "BartjeB";
   device["model"] = "Battery Sense via ESP32";
   device["sw_version"] = kFirmwareVersion;
   device["configuration_url"] = "http://" + WiFi.localIP().toString();
@@ -64,36 +64,37 @@ bool lowDiscovery(size_t slot) {
   doc["name"] = "Lage spanning";
   doc["unique_id"] = "ctek_" + gatewayIdentifier + "_" + id(slot) + "_low_voltage";
   doc["state_topic"] = sensorRoot(slot) + "/state";
-  doc["value_template"] = "{{ 'ON' if value_json.low_voltage else 'OFF' }}";
+  doc["value_template"] = "{{ 'None' if value_json.low_voltage is not defined or value_json.low_voltage is none else ('ON' if value_json.low_voltage else 'OFF') }}";
   doc["device_class"] = "problem";
   doc["expire_after"] = kStaleSeconds;
   availability(doc, slot); deviceInfo(doc, slot);
   return publishJson(discoveryTopic(slot, "binary_sensor", "low_voltage"), doc, true);
 }
 bool publishDiscovery(size_t slot) {
-  bool success = discovery(slot, "voltage", "Spanning", "V", "voltage", 2);
-  success = discovery(slot, "temperature", "Temperatuur bij spanningsmeting", "°C", "temperature", 1) && success;
-  success = discovery(slot, "current_temperature", "Actuele temperatuur", "°C", "temperature", 1) && success;
-  success = discovery(slot, "rssi", "Bluetooth-signaal", "dBm", "signal_strength", 0, true) && success;
+  bool success = discovery(slot, "voltage", "Actuele spanning", "V", "voltage", 2);
+  success = discovery(slot, "temperature", "Actuele temperatuur", "°C", "temperature", 1) && success;
+  for (const char* retired : {"current_temperature", "rssi"})
+    success = mqtt.publish(discoveryTopic(slot, "sensor", retired).c_str(), "", true) && success;
   return lowDiscovery(slot) && success;
 }
 
 bool publishReading(size_t slot) {
   const auto& state = states[slot];
   const auto& result = state.reading;
-  const auto& latest = result.samples[result.count - 1];
   auto values = ctek::telemetry(result, millis(), state.readMs, state.readEpoch, config.lowVoltage, kStaleSeconds);
   JsonDocument doc;
-  doc["voltage"] = latest.voltage;
-  if (values.historicalTemperatureValid) doc["temperature"] = latest.temperature;
+  if (result.currentVoltageValid) doc["voltage"] = result.currentVoltage;
+  else doc["voltage"] = nullptr;
+  if (result.currentTemperatureValid) doc["temperature"] = result.currentTemperature;
   else doc["temperature"] = nullptr;
-  if (result.currentTemperatureValid) doc["current_temperature"] = result.currentTemperature;
-  else doc["current_temperature"] = nullptr;
-  doc["low_voltage"] = values.lowVoltage;
+  if (values.lowVoltageValid) doc["low_voltage"] = values.lowVoltage;
+  else doc["low_voltage"] = nullptr;
   doc["low_voltage_threshold"] = config.lowVoltage;
   doc["rssi"] = state.rssi;
-  doc["source"] = result.live ? "live" : "history";
+  doc["source"] = result.currentVoltageValid ? "live" : "history";
   doc["sample_age_seconds"] = readingAge(slot);
+  if (state.readEpoch) doc["last_successful_read"] = state.readEpoch;
+  else doc["last_successful_read"] = nullptr;
   doc["sample_period_minutes"] = result.metadata.periodMinutes;
   doc["sensor_uptime_seconds"] = result.metadata.uptime;
   doc["cursor"] = result.metadata.cursor;
@@ -101,7 +102,7 @@ bool publishReading(size_t slot) {
   doc["sensor_reset_detected"] = result.plan.reset;
   uint64_t epoch = values.sampleTime;
   if (epoch) doc["sample_time"] = epoch; else doc["sample_time"] = nullptr;
-  doc["sample_time_estimated"] = !result.live;
+  doc["sample_time_estimated"] = !result.currentVoltageValid;
   // Not retained: HA's expire_after must not be reset by replaying an old retained value.
   return publishJson(sensorRoot(slot) + "/state", doc);
 }

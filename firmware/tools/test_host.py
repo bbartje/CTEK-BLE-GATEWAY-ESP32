@@ -3,10 +3,12 @@ from pathlib import Path
 import os
 import subprocess
 import tempfile
+import sys
 
 root = Path(__file__).resolve().parents[1]
+subprocess.run([sys.executable, str(root / "test/webserver_security_test.py")], check=True)
 with tempfile.TemporaryDirectory(prefix="ctek-host-tests-") as folder:
-    for suite in ("protocol", "session", "ble_diagnostics", "image", "telemetry", "admin"):
+    for suite in ("protocol", "session", "ble_diagnostics", "image", "telemetry", "admin", "time_zone"):
         executable = Path(folder) / (suite + "_test")
         subprocess.run([
             os.environ.get("CXX", "g++"), "-std=c++17", "-Wall", "-Wextra", "-Werror",

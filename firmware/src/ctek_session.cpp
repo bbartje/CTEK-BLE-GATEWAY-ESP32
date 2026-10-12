@@ -33,15 +33,20 @@ SessionResult runSession(Transport& io, const std::string& code, const Metadata*
     if (result.metadata.uptime <= 6) { result.error = "Sensor net gestart; nog geen metingen"; return result; }
     uint8_t voltage[20]; size_t voltageSize = 0;
     if (!io.read(kLiveVoltage, voltage, sizeof(voltage), voltageSize) ||
-        !decodeLiveVoltage(voltage, voltageSize, result.samples[0].voltage)) {
+        !decodeLiveVoltage(voltage, voltageSize, result.currentVoltage)) {
       const char* detail = io.readError();
       result.error = detail ? detail : "Geen historie en live-spanning niet beschikbaar";
       return result;
     }
+    result.currentVoltageValid = true;
     result.live = true;
     result.count = 1;
+    result.samples[0].voltage = result.currentVoltage;
     result.samples[0].temperature = result.currentTemperature;
   } else {
+    uint8_t voltage[20]; size_t voltageSize = 0;
+    result.currentVoltageValid = io.read(kLiveVoltage, voltage, sizeof(voltage), voltageSize) &&
+        decodeLiveVoltage(voltage, voltageSize, result.currentVoltage);
     result.plan = planHistory(result.metadata, previous);
     if (!io.subscribe()) { result.error = "Meetnotificaties inschakelen mislukt"; return result; }
     for (const Range& range : result.plan.ranges) {

@@ -30,6 +30,17 @@ int main() {
   assert(checkInitialPassword("EigenNieuw123!", "") == PasswordProblem::Mismatch);
   assert(checkInitialPassword("EigenNieuw123!", "EigenNieuw123!") == PasswordProblem::None);
 
+  assert(recoveryCredentialWindowOpen(0, 0));
+  assert(recoveryCredentialWindowOpen(kRecoveryCredentialWindowMs - 1, 0));
+  assert(!recoveryCredentialWindowOpen(kRecoveryCredentialWindowMs, 0));
+  assert(recoveryCredentialWindowOpen(50, UINT32_MAX - 100));
+  assert(!recoveryCredentialWindowOpen(119900, UINT32_MAX - 100));
+  assert(recoveryLoginAllowed(false, true, true, true));
+  assert(!recoveryLoginAllowed(true, true, true, true));
+  assert(!recoveryLoginAllowed(false, false, true, true));
+  assert(!recoveryLoginAllowed(false, true, false, true));
+  assert(!recoveryLoginAllowed(false, true, true, false));
+
   // Both the normal route guard and multipart OTA use this production policy.
   for (bool changeRequired : {false, true}) {
     for (bool passwordPage : {false, true})
@@ -39,5 +50,9 @@ int main() {
   assert(webAccess(true, true, true) == WebAccess::Allowed);
   assert(webAccess(true, false) == WebAccess::Allowed);
   assert(webAccess(true, false, true) == WebAccess::Allowed);
+  assert(webAccess(false, false, false, true) == WebAccess::PasswordChangeRequired);
+  assert(webAccess(false, false, true, true) == WebAccess::Allowed);
+  assert(webAccess(false, false, true, false) == WebAccess::LoginRequired);
+  assert(webAccess(true, false, false, true) == WebAccess::Allowed);
   std::cout << "Beheertests geslaagd: verplicht vervangen startwachtwoord, invoergrenzen, herhaling en toegangsbeleid.\n";
 }

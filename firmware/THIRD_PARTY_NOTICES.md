@@ -22,6 +22,12 @@ copyrights en licenties; raadpleeg de upstream bronnen en package voor de
 volledige teksten. De ESP32 ROM en sommige radio-bibliotheken horen bij het
 Espressif-platform. De XAPK is alleen analyse-input en zit niet in het flashpakket.
 
+De Arduino WebServer-parser krijgt tijdens bouwen een gerichte beveiligings-
+correctie voor CVE-2026-42854. De oorspronkelijke copyrights en LGPL-licentie
+blijven gelden. De reproduceerbare wijziging staat in
+[`tools/webserver_security.py`](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/blob/main/firmware/tools/webserver_security.py); de SDK-installatie
+wordt niet gewijzigd.
+
 De communicatie is onafhankelijk opnieuw geïmplementeerd op basis van
 vastgestelde protocolfeiten. Gedecompileerde Android-bronnen zijn niet
 gekopieerd in de runtime. CTEK-merken en appmateriaal blijven van CTEK en hun

@@ -11,6 +11,7 @@ import sys
 import zipfile
 
 from release_validation import validate_factory, validate_image, validate_partitions
+from webserver_security import guarded_parser
 
 root = Path(__file__).resolve().parents[1]
 repository = root.parent
@@ -30,6 +31,9 @@ python = info["python_exe"]["value"]
 sdk = core / "packages/framework-arduinoespressif32"
 build = root / ".pio/build/esp32-wroom-32"
 esptool = core / "packages/tool-esptoolpy/esptool.py"
+parser_source = sdk / "libraries/WebServer/src/Parsing.cpp"
+if (build / "ctek-security/Parsing.cpp").read_text() != guarded_parser(parser_source.read_text()):
+    raise RuntimeError("De beveiligde WebServer-parser ontbreekt in de build")
 
 ota = output / "ctek-esp32-wroom-32-ota.bin"
 factory = output / "ctek-esp32-wroom-32-factory.bin"
@@ -71,11 +75,13 @@ manifest = {
     "factory_offset": "0x0", "application_offset": "0x10000",
     "partitions": {name: {"type": value[0], "subtype": value[1], "offset": hex(value[2]), "bytes": value[3]} for name, value in partitions.items()},
     "files": {ota.name: application, factory.name: {"bytes": factory.stat().st_size, "sha256": hashlib.sha256(factory.read_bytes()).hexdigest()}},
-    "checks": {"host_tests": "passed", "esp32_build": "passed", "image_checksums": "passed", "flash_layout": "passed", "physical_sensor": "not tested", "mqtt_hardware": "not tested", "ota_hardware": "not tested"},
+    "checks": {"host_tests": "passed", "esp32_build": "passed", "image_checksums": "passed", "flash_layout": "passed", "webserver_boundary_guard": "passed", "physical_sensor": "not tested", "mqtt_hardware": "not tested", "ota_hardware": "not tested"},
+    "security_backports": ["CVE-2026-42854"],
     "dependencies": {"platformio": "6.1.19", "espressif32": "7.1.3", "arduino_esp32": "2.0.17", "nimble": "2.5.1", "pubsubclient": "2.8.0", "arduinojson": "7.4.3"},
 }
 (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 shutil.copyfile(repository / "docs/FLASHEN.md", output / "FLASHEN.md")
+shutil.copyfile(repository / "docs/ACCEPTATIETEST.md", output / "ACCEPTATIETEST.md")
 shutil.copyfile(root / "THIRD_PARTY_NOTICES.md", output / "THIRD_PARTY_NOTICES.md")
 licenses = output / "licenses"; licenses.mkdir(exist_ok=True)
 for library, source in [

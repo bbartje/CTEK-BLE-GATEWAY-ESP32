@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.5/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.6/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -55,6 +55,16 @@ de normale checksum en SHA. De OTA-headercontrole kan zo een andere app weigeren
 - `telemetry` / `firmware_image`: gedeelde en geteste beslissingen over versheid,
   spanning, tijd, foutinterval en toegestane updateheaders.
 - `admin_access`: startwachtwoord, invoercontrole en verplichte eerste wijziging.
+- `web_ui`: leesbare HTML en browsercode voor taalkeuze en sensorplekken;
+  dezelfde code wordt met jsdom (een nagebootste browser) getest.
+
+De bouwstap `tools/webserver_security.py` begrenst multipart-scheidingstekens
+op 70 tekens vóór de uploadparser geheugen op de stack reserveert. Dit is een
+gerichte correctie voor [CVE-2026-42854](https://github.com/espressif/arduino-esp32/security/advisories/GHSA-8cmm-3887-r32j)
+in Arduino 2.0.17. PlatformIO compileert een kopie onder `.pio/build/`;
+de geïnstalleerde SDK blijft intact. Bij een onverwachte parserwijziging
+stopt de build, zodat de correctie opnieuw beoordeeld moet worden. De hosttest
+controleert de grenzen 0, 1, 70, 71 en 12.000 vóór geheugenreservering.
 
 Alle NimBLE-aanroepen lopen via één worker. Opdrachten bevatten een kopie van
 adres/code en een versienummer voor de sensorplek. Een tussentijdse wijziging
@@ -95,12 +105,13 @@ retry, timing bij `millis()`-overloop en het negeren van opruimcallbacks.
 ## MQTT-contract
 
 Vanaf beta.5 bevat de sensor-Discovery `suggested_display_precision`: 2 voor
-spanning, 1 voor historische en actuele temperatuur, en 0 voor signaalsterkte.
-Dit bepaalt de standaardweergave in Home Assistant; de numerieke waarden op
-`/state` en `/history` worden niet extra afgerond. Na MQTT-verbinding en een
-Home Assistant birthbericht wordt Discovery opnieuw gepubliceerd, met dezelfde
-sensoridentiteiten. Een handmatige decimaalinstelling in Home Assistant gaat
-voor op dit voorstel. Zie de [MQTT-sensordocumentatie](https://www.home-assistant.io/integrations/sensor.mqtt/)
+spanning en 1 voor temperatuur. Beta.6 publiceert één live spanningsensor,
+één actuele temperatuursensor en de bestaande lage-spanningsstatus. De gateway
+verwijdert de oude Discovery-entiteiten voor `current_temperature` en RSSI;
+de bestaande `temperature`-entiteit vertegenwoordigt voortaan de actuele
+temperatuur. De fabrikant in Home Assistant is `BartjeB`. Numerieke waarden
+worden niet extra afgerond; een handmatige decimaalinstelling in Home Assistant
+gaat voor op het voorstel. Zie de [MQTT-sensordocumentatie](https://www.home-assistant.io/integrations/sensor.mqtt/)
 en [uitleg over weergaveprecisie](https://developers.home-assistant.io/blog/2023/02/08/sensor_presentation_rounding/).
 
 `<gateway>` = wifi-MAC zonder dubbele punten, kleine letters.
@@ -116,21 +127,27 @@ en [uitleg over weergaveprecisie](https://developers.home-assistant.io/blog/2023
 | `homeassistant/sensor/ctek_<gateway>_<sensor>/<veld>/config` | Discovery | Ja |
 | `homeassistant/binary_sensor/ctek_<gateway>_<sensor>/low_voltage/config` | Discovery waarschuwing | Ja |
 
-State bevat `voltage`, `temperature` (bij de spanningsmeting),
-`current_temperature` (apart gelezen), `low_voltage`, `low_voltage_threshold`,
-`rssi`, `source`, `sample_age_seconds`, `sample_period_minutes`,
-`sensor_uptime_seconds`, `cursor`, `history_omitted`, `sensor_reset_detected`,
-`sample_time` (Unix-seconden of null) en `sample_time_estimated`.
-Een ontbrekende temperatuur is **null**, geen verzonnen nul graden.
+State bevat live `voltage` en `temperature` (de actuele temperatuur),
+`low_voltage`, `low_voltage_threshold`, `rssi`, `source`, `sample_age_seconds`,
+`last_successful_read`, `sample_period_minutes`, `sensor_uptime_seconds`,
+`cursor`, `history_omitted`, `sensor_reset_detected`, `sample_time` (Unix-seconden
+of null) en `sample_time_estimated`. Tijdstempels zijn Unix epoch in UTC; Home
+Assistant toont ze in zijn ingestelde tijdzone. Bij een ontbrekend live meetpunt
+is de bijbehorende livewaarde **null**, nooit een verzonnen nul.
+Bij ontbrekende live-spanning is ook `low_voltage` null. Home Assistant toont
+dan onbekend, via de [MQTT binary-sensordefinitie](https://www.home-assistant.io/integrations/binary_sensor.mqtt/).
+Een historisch record bepaalt geen actuele waarschuwing. De beheerpagina
+benoemt historische spanning uitdrukkelijk als historisch.
 
 Voorbeeld met fictieve gegevens:
 
 ```json
-{"voltage":12.5,"temperature":20.5,"current_temperature":21.0,
- "low_voltage":false,"low_voltage_threshold":12.2,"rssi":-68,
- "source":"history","sample_age_seconds":60,"sample_period_minutes":5,
- "sensor_uptime_seconds":960,"cursor":3,"history_omitted":0,
- "sensor_reset_detected":false,"sample_time":null,"sample_time_estimated":true}
+{"voltage":12.54,"temperature":21.0,"low_voltage":false,
+ "low_voltage_threshold":12.2,"rssi":-68,"source":"live",
+ "sample_age_seconds":0,"last_successful_read":1791792000,
+ "sample_period_minutes":5,"sensor_uptime_seconds":960,"cursor":3,
+ "history_omitted":0,"sensor_reset_detected":false,
+ "sample_time":1791792000,"sample_time_estimated":false}
 ```
 
 Home Assistant vereist online-status van zowel gateway als sensor en gebruikt
@@ -168,6 +185,30 @@ Default pollinterval 300 s; instelbaar 60–900 s. Bij mislukking retry na
 30/60/120/240/300 s. Bij vier verdwenen sensoren wordt ieder om de beurt
 geprobeerd; geen eindeloze poging voor dezelfde sensor.
 
+De beheerpagina ondersteunt Nederlands, Engels en Duits. De browser bewaart de
+keuze lokaal. Alleen ingestelde sensoren en de eerstvolgende lege plek worden
+getoond; met `+` verschijnt een volgende plek, tot het maximum van vier.
+BLE-logs blijven achter een uitklapmenu.
+
+Na iedere herstart met opgeslagen thuiswifi verschijnt twee minuten een herstel-AP met het
+publieke startwachtwoord `CTEK-Start123`; normale wifi-, BLE- en MQTT-start
+worden niet vertraagd en instellingen worden niet gewist. In dit venster werkt
+ook `admin` met het startwachtwoord, uitsluitend voor de wachtwoordherstelpagina
+op de setup-interface en vanuit het setup-subnet. Instellingen, diagnostics en
+OTA blijven voor deze login geblokkeerd. Via de thuiswifi is het openbare
+wachtwoord ongeldig. Na herstellen blijven andere instellingen bewaard.
+Iedereen binnen radiobereik kan tijdens het venster het wachtwoord vervangen;
+de eigenaar heeft deze herstelkeuze voor deze bètatest bewust geaccepteerd.
+De openbare herstel-login verloopt op een vaste deadline, ook als een browser
+verbonden blijft. Bij een latere opgeslagen-wifi-uitval kan de bestaande
+setup-AP terugkomen met het eigen beheerwachtwoord.
+
+De ingestelde tijdzone is een regio-ID en standaard `Europe/Amsterdam`; de
+firmware gebruikt bijbehorende POSIX-regels voor zomer-/wintertijd. De selectie
+bevat ook UTC, Londen, Lissabon, vier gangbare Noord-Amerikaanse zones, India,
+China, Singapore, Tokio, Sydney en Auckland. De webpagina toont lokale tijd;
+MQTT blijft UTC epoch versturen zodat Home Assistant lokaal kan formatteren.
+
 Bij lege configuratie gebruikt het bord het publieke startwachtwoord
 `CTEK-Start123`, voor WPA2-setup en HTTP-login als `admin`. Alleen de pagina om
 een eigen wachtwoord te kiezen is dan beschikbaar. Andere beheerpagina's,
@@ -183,8 +224,9 @@ in RAM niet vrijgegeven. Na opslaan herstart het bord en heeft het setupnetwerk
 het nieuwe wachtwoord. Bestaande eigen wachtwoorden uit beta.1 blijven bij OTA
 geldig; een factory-flash wist instellingen en begint opnieuw met het publieke
 startwachtwoord. PuTTY is voor installatie niet nodig. USB-serieel kan nog als
-lokale herstel-/diagnostiekmogelijkheid dienen; de opstartuitvoer bevat het
-beheerwachtwoord, dus bewaar die privé.
+lokale diagnostiekmogelijkheid dienen; de opstartuitvoer toont geen eigen
+beheerwachtwoord meer. Oude firmwareversies konden dit wel tonen: deel oude
+opstartlogs daarom niet zonder ze te controleren.
 
 HTTP Basic-login en een formuliercode beschermen configuratie en uploads.
 Wachtwoorden/codes worden nooit teruggestuurd in formulieren of

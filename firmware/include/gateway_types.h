@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "ctek_session.h"
 
-constexpr char kFirmwareVersion[] = "0.2.0-beta.5";
+constexpr char kFirmwareVersion[] = "0.2.0-beta.6";
 constexpr uint32_t kStaleSeconds = 1800;
 constexpr size_t kScanLimit = 24;
 
@@ -11,7 +11,7 @@ struct SensorConfig {
   uint8_t addressType = 0;
 };
 struct GatewayConfig {
-  String ssid, wifiPassword, mqttHost, mqttUser, mqttPassword, adminPassword;
+  String ssid, wifiPassword, mqttHost, mqttUser, mqttPassword, adminPassword, timezone;
   uint16_t mqttPort = 1883;
   uint32_t pollSeconds = 300;
   float lowVoltage = 12.2f;
@@ -69,6 +69,7 @@ bool receiveBle(BleReport& report);
 void loadConfiguration();
 void saveConfiguration();
 bool initialSetupPending();
+bool recoveryAccessOpen();
 bool saveAdminPassword(const String& password);
 void saveSensors();
 void startNetwork();

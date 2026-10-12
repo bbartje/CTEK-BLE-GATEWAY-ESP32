@@ -18,7 +18,9 @@ struct SessionResult {
   bool success = false;
   bool live = false;
   bool currentTemperatureValid = false;
+  bool currentVoltageValid = false;
   float currentTemperature = 0;
+  float currentVoltage = 0;
   Metadata metadata{};
   HistoryPlan plan{};
   std::array<Sample, kMaxHistory> samples{};

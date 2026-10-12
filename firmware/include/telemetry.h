@@ -5,6 +5,7 @@ namespace ctek {
 struct Telemetry {
   bool fresh = false;
   bool lowVoltage = false;
+  bool lowVoltageValid = false;
   bool historicalTemperatureValid = false;
   uint32_t ageSeconds = 0;
   uint64_t sampleTime = 0;
@@ -15,11 +16,12 @@ inline Telemetry telemetry(const SessionResult& result, uint32_t nowMs,
   Telemetry output;
   if (!result.success || !result.count || result.count > kMaxHistory) return output;
   output.ageSeconds = uint32_t(nowMs - readMs) / 1000 +
-                      (result.live ? 0 : latestAgeSeconds(result.metadata));
+                      (result.live || result.currentVoltageValid ? 0 : latestAgeSeconds(result.metadata));
   output.fresh = output.ageSeconds < staleSeconds;
-  output.lowVoltage = result.samples[result.count - 1].voltage < threshold;
+  output.lowVoltageValid = result.currentVoltageValid;
+  output.lowVoltage = output.lowVoltageValid && result.currentVoltage < threshold;
   output.historicalTemperatureValid = !result.live || result.currentTemperatureValid;
-  output.sampleTime = result.live ? readEpoch :
+  output.sampleTime = result.live || result.currentVoltageValid ? readEpoch :
       sampleEpoch(readEpoch, result.metadata, result.count, result.count - 1);
   return output;
 }
