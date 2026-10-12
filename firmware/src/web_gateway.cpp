@@ -2,6 +2,7 @@
 #include "admin_access.h"
 #include "firmware_image.h"
 #include "time_zone.h"
+#include "telemetry.h"
 #include "web_ui.h"
 #include <ArduinoJson.h>
 #include <Update.h>
@@ -196,6 +197,7 @@ void root() {
   page += input("admin_password", "Nieuw beheer-/setupwachtwoord; leeg = behouden (12–63 tekens)", "New admin/setup password; leave blank to keep (12–63 characters)", "Neues Admin-/Setup-Passwort; leer lassen zum Beibehalten (12–63 Zeichen)", "", "type='password' minlength='12' maxlength='63' autocomplete='new-password'");
   page += "</fieldset><button>" + localized("Instellingen opslaan en herstarten", "Save settings and restart", "Einstellungen speichern und neu starten") + "</button></form>";
   page += "<h2>" + localized("Batterijmonitors", "Battery monitors", "Batteriemonitore") + "</h2><p>" + localized("Verbindingen gaan om de beurt. Oude metingen vervallen na 30 minuten.", "Sensors are read one at a time. Readings expire after 30 minutes.", "Die Sensoren werden nacheinander ausgelesen. Messwerte verfallen nach 30 Minuten.") + "</p>";
+  page += "<small>" + localized("Bluetooth-ontvangst: −60 dBm is sterker dan −90 dBm. De waarde hoort bij de laatste geslaagde meting.", "Bluetooth signal: −60 dBm is stronger than −90 dBm. The value is from the last successful reading.", "Bluetooth-Empfang: −60 dBm ist stärker als −90 dBm. Der Wert stammt aus der letzten erfolgreichen Messung.") + "</small>";
   page += "<form method='post' action='/scan'>" + token() + "<button>" + localized("Zoek Bluetooth-apparaten (6 seconden)", "Scan for Bluetooth devices (6 seconds)", "Nach Bluetooth-Geräten suchen (6 Sekunden)") + "</button></form>";
   if (scanRequested || (workInFlight && !scanFinished)) page += "<p>" + localized("Zoeken of uitlezen bezig. Vernieuw deze pagina na enkele seconden.", "Scan or read in progress. Refresh this page in a few seconds.", "Suche oder Abfrage läuft. Aktualisieren Sie diese Seite in einigen Sekunden.") + "</p>";
   if (scanFinished) {
@@ -220,6 +222,11 @@ void root() {
       else page += localized("Niet beschikbaar", "Unavailable", "Nicht verfügbar");
       page += "</strong>";
       if (state.hasReading && state.reading.currentVoltageValid && !readingFresh(slot)) page += "<small class='sensor-freshness'>" + localized("verouderd", "stale", "veraltet") + "</small>";
+      page += "</div><div><span class='sensor-caption'>" + localized("Bluetooth", "Bluetooth", "Bluetooth") + "</span><strong class='sensor-rssi'>";
+      if (state.hasReading && ctek::rssiAvailable(state.rssi)) page += String(state.rssi) + " dBm";
+      else page += localized("Niet beschikbaar", "Unavailable", "Nicht verfügbar");
+      page += "</strong>";
+      if (state.hasReading && ctek::rssiAvailable(state.rssi) && !readingFresh(slot)) page += "<small class='sensor-freshness'>" + localized("verouderd", "stale", "veraltet") + "</small>";
       page += "</div><div class='sensor-time'><span class='sensor-caption'>" + localized("Laatste meting", "Last reading", "Letzte Messung") + "</span>";
       if (state.hasReading) page += state.readEpoch ? localTime(state.readEpoch) : localized("tijd niet gesynchroniseerd", "time not synchronized", "Zeit nicht synchronisiert");
       else page += localized("Nog geen meting", "No reading yet", "Noch keine Messung");

@@ -1,0 +1,75 @@
+{
+  "version": "0.2.0-beta.9",
+  "built_at_utc": "2026-10-12T11:05:21.089194+00:00",
+  "base_commit": "a4d4f1adaba4a45e2bb6a05af55b07d375b5d270",
+  "firmware_source_sha256": "5b160994f2a66e2475fe0308b245b4b6002a4346a95e9832abb60729420463e0",
+  "chip": "ESP32-D0WD-V3 / ESP32-WROOM-32",
+  "flash_bytes": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency_mhz": 40,
+  "factory_offset": "0x0",
+  "application_offset": "0x10000",
+  "partitions": {
+    "nvs": {
+      "type": 1,
+      "subtype": 2,
+      "offset": "0x9000",
+      "bytes": 20480
+    },
+    "otadata": {
+      "type": 1,
+      "subtype": 0,
+      "offset": "0xe000",
+      "bytes": 8192
+    },
+    "ota_0": {
+      "type": 0,
+      "subtype": 16,
+      "offset": "0x10000",
+      "bytes": 1966080
+    },
+    "ota_1": {
+      "type": 0,
+      "subtype": 17,
+      "offset": "0x1f0000",
+      "bytes": 1966080
+    },
+    "spiffs": {
+      "type": 1,
+      "subtype": 130,
+      "offset": "0x3d0000",
+      "bytes": 196608
+    }
+  },
+  "files": {
+    "ctek-esp32-wroom-32-ota.bin": {
+      "bytes": 1211072,
+      "sha256": "a28714813ea77ac9236ef502c72496f3ef66f715c1cecb1341f386b0958180a4"
+    },
+    "ctek-esp32-wroom-32-factory.bin": {
+      "bytes": 1276608,
+      "sha256": "eab9d59a6c27def64d81d779fa7182485559a2d445ed731ee2b3d236cb31bd1f"
+    }
+  },
+  "checks": {
+    "host_tests": "passed",
+    "esp32_build": "passed",
+    "image_checksums": "passed",
+    "flash_layout": "passed",
+    "webserver_boundary_guard": "passed",
+    "physical_sensor": "not tested",
+    "mqtt_hardware": "not tested",
+    "ota_hardware": "not tested"
+  },
+  "security_backports": [
+    "CVE-2026-42854"
+  ],
+  "dependencies": {
+    "platformio": "6.1.19",
+    "espressif32": "7.1.3",
+    "arduino_esp32": "2.0.17",
+    "nimble": "2.5.1",
+    "pubsubclient": "2.8.0",
+    "arduinojson": "7.4.3"
+  }
+}

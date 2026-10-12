@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.8/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.9/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -107,12 +107,19 @@ retry, timing bij `millis()`-overloop en het negeren van opruimcallbacks.
 Vanaf beta.5 bevat de sensor-Discovery `suggested_display_precision`: 2 voor
 spanning en 1 voor temperatuur. Beta.6 publiceert één live spanningsensor,
 één actuele temperatuursensor en de bestaande lage-spanningsstatus. De gateway
-verwijdert de oude Discovery-entiteiten voor `current_temperature` en RSSI;
+verwijdert de oude Discovery-entiteit voor `current_temperature`;
 de bestaande `temperature`-entiteit vertegenwoordigt voortaan de actuele
 temperatuur. De fabrikant in Home Assistant is `BartjeB`. Numerieke waarden
 worden niet extra afgerond; een handmatige decimaalinstelling in Home Assistant
 gaat voor op het voorstel. Zie de [MQTT-sensordocumentatie](https://www.home-assistant.io/integrations/sensor.mqtt/)
 en [uitleg over weergaveprecisie](https://developers.home-assistant.io/blog/2023/02/08/sensor_presentation_rounding/).
+
+Beta.9 herstelt de `rssi`-sensor als `Bluetooth-signaal`, met eenheid `dBm`,
+apparaatklasse `signal_strength`, nul decimalen en hetzelfde `unique_id` als
+vóór beta.6. De sensor staat bij de gewone sensoren. Hij is tijdens beta.6–8
+uit Discovery verwijderd, terwijl de RSSI in het statebericht bleef staan.
+De waarde hoort bij de laatste geslaagde uitlezing. NimBLE's foutwaarde `0`
+en de controllerwaarde `127` voor onbekend worden als `null` verstuurd.
 
 `<gateway>` = wifi-MAC zonder dubbele punten, kleine letters.
 `<sensor>` = sensor-MAC zonder dubbele punten, kleine letters.
@@ -138,6 +145,8 @@ Bij ontbrekende live-spanning is ook `low_voltage` null. Home Assistant toont
 dan onbekend, via de [MQTT binary-sensordefinitie](https://www.home-assistant.io/integrations/binary_sensor.mqtt/).
 Een historisch record bepaalt geen actuele waarschuwing. De beheerpagina
 benoemt historische spanning uitdrukkelijk als historisch.
+Bij ontbrekende RSSI is ook `rssi` null; een startwaarde of fout wordt niet als
+een ontvangststerkte van 0 dBm gepresenteerd.
 
 Voorbeeld met fictieve gegevens:
 
@@ -191,8 +200,11 @@ alle lege plekken blijven verborgen totdat je op `+` klikt. Iedere klik opent
 één lege plek, ook vóór het opslaan van de eerste sensor. Bij vier ingestelde
 sensoren verdwijnt de plusknop. Niet opgeslagen plekken zijn na verversen weer
 verborgen.
-Vanaf beta.8 toont een ingestelde sensor een compacte kaart met alleen naam,
-spanning en tijdstip van de laatste geslaagde meting. Temperatuur, status,
+Vanaf beta.8 toont een ingestelde sensor een compacte kaart met naam,
+spanning en tijdstip van de laatste geslaagde meting. Beta.9 voegt de
+Bluetooth-ontvangststerkte in dBm toe aan deze eerste weergave. Bijvoorbeeld:
+−60 dBm is sterker dan −90 dBm. Ontbrekende RSSI is niet beschikbaar; een
+verouderde waarde wordt als verouderd gemarkeerd. Temperatuur, status,
 tellers, `Nu uitlezen`, BLE-log, wijzigen en verwijderen staan onder
 `Details en instellingen`, standaard ingeklapt. Ontbrekende live-spanning wordt
 op de kaart als niet beschikbaar getoond; een verouderde waarde blijft als

@@ -15,6 +15,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere}[hidden]{display:none!important}
 .sensor-reading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem 1.5rem}
 .sensor-caption{display:block;color:#52635f;font-size:.85rem;margin-bottom:.2rem}
 .sensor-voltage{display:block;font-size:1.8rem;line-height:1.2;overflow-wrap:anywhere}
+.sensor-rssi{display:block;font-size:1.2rem}
 .sensor-time{line-height:1.5}.sensor-freshness{display:block;margin-top:.2rem}
 .sensor-settings{margin-top:.8rem;border-top:1px solid #d7e2de;padding-top:.6rem}summary{cursor:pointer}
 </style>

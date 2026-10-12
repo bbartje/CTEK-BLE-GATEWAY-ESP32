@@ -5,6 +5,9 @@
 
 int main() {
   using namespace ctek;
+  assert(rssiAvailable(-60) && rssiAvailable(-90));
+  assert(!rssiAvailable(0));    // NimBLE error/default value is not a strong signal.
+  assert(!rssiAvailable(127));  // Bluetooth controller's unavailable value.
   SessionResult result;
   assert(!telemetry(result, 0, 0, 0, 12.2f, 1800).fresh);
   result.success = true; result.count = 1; result.metadata = {960, 5, 3};
@@ -43,5 +46,5 @@ int main() {
   assert(failureBackoffMs(1) == 30000 && failureBackoffMs(2) == 60000);
   assert(failureBackoffMs(3) == 120000 && failureBackoffMs(4) == 240000);
   assert(failureBackoffMs(5) == 300000 && failureBackoffMs(999999) == 300000);
-  std::cout << "Telemetrietests geslaagd: verouderde gegevens, drempel, tijden en fout-backoff.\n";
+  std::cout << "Telemetrietests geslaagd: RSSI-beschikbaarheid, verouderde gegevens, drempel, tijden en fout-backoff.\n";
 }

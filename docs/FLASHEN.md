@@ -1,13 +1,13 @@
 # Flash and Set Up the Gateway Without PlatformIO or PuTTY
 
 For **ESP32-WROOM-32, ESP32-D0WD-V3 revision 3, with 4 MB flash** only.
-Firmware **0.2.0-beta.8** has passed software checks, but still needs testing
+Firmware **0.2.0-beta.9** has passed software checks, but still needs testing
 with your physical Battery Sense units. This image is not for ESP32-C3/S3/S2.
 
 ## 1. First Flash with the ESP32 Flash Download Tool
 
 Download the official [Espressif Flash Download Tool](https://www.espressif.com/en/support/download/other-tools).
-Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.8/ctek-esp32-wroom-32-factory.bin)
+Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.9/ctek-esp32-wroom-32-factory.bin)
 or extract the ZIP from `firmware/releases/`. For USB installation, use
 **ctek-esp32-wroom-32-factory.bin**. PlatformIO is not needed to flash it.
 
@@ -115,13 +115,16 @@ and restarts the setup process above.
    characters without the `40149` prefix. Save. You can correct an invalid code
    on the web page; open **Details and settings** to edit a saved sensor.
 4. Refresh after 15–60 seconds. The compact sensor card shows its name,
-   voltage, and the last successful measurement time. Open **Details and
+   voltage, Bluetooth signal strength, and the last successful measurement time.
+   The Bluetooth value is from the last successful read, in dBm; −60 dBm is
+   stronger than −90 dBm. Open **Details and
    settings** to check temperature and **Reading received**. A new sensor
    without history uses live voltage. With the vehicle stationary, compare
    voltage with the CTEK app or a multimeter, then close the app again.
 5. Confirm the MQTT integration is active in Home Assistant. Under
    **Settings → Devices & services → MQTT**, the device should appear with live
-   voltage, current temperature, and **Low voltage** status. Home Assistant
+   voltage, current temperature, **Bluetooth-signaal** in dBm, and **Low voltage**
+   status. Home Assistant
    stores its own history from these live updates. The default display uses two
    decimal places for voltage and one for temperature. A precision setting you
    chose manually in Home Assistant takes precedence.
@@ -141,6 +144,10 @@ includes procedure details and raw measurement metadata, but no codes or
 passwords. Remove sensor addresses before sharing diagnostics publicly. USB is
 not needed for these checks.
 
+Bluetooth signal strength also becomes stale with old readings. Before the
+first successful read or if RSSI cannot be measured, the card says
+**Unavailable** and Home Assistant has no numeric RSSI value.
+
 ## 4. Check the Final Installation Location
 
 Move the board only after sensor 1 and MQTT work. At the final location, test
@@ -155,7 +162,7 @@ within range and confirm that it recovers without restarting the board.
 
 ## 5. Update Firmware over Wi-Fi
 
-For an update from beta.1 through beta.7, [download the beta.8 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.8/ctek-esp32-wroom-32-ota.bin).
+For an update from beta.1 through beta.8, [download the beta.9 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.9/ctek-esp32-wroom-32-ota.bin).
 
 1. Open the gateway page and select **Pause polling and update firmware**. Wait
    for the active read to finish, then refresh the update page.
@@ -166,16 +173,19 @@ For an update from beta.1 through beta.7, [download the beta.8 OTA image](https:
 4. If an upload is cancelled or fails, the current firmware remains selected.
    Polling resumes after **Cancel** or five minutes of inactivity.
 
-After the update, confirm the page reports **0.2.0-beta.8**. Each configured
-sensor card shows only name, voltage, and the last successful measurement time.
+After the update, confirm the page reports **0.2.0-beta.9**. Each configured
+sensor card shows name, voltage, Bluetooth signal strength, and the last
+successful measurement time.
 **Details and settings** starts closed and contains temperature, status,
 counters, **Read now**, logs, and the settings form. Empty sensor forms appear
 only after clicking **+**. Refreshing the page closes the details and hides any
 empty forms that have not been saved. The gateway
 republishes Discovery: voltage defaults to two decimal places and current
 temperature to one. The `voltage`, `temperature`, and `low_voltage` entity IDs
-remain stable. The old separate `current_temperature` and Bluetooth RSSI
-entities are removed; the existing `temperature` entity now represents the
+remain stable. **Bluetooth-signaal** is restored using its original RSSI
+entity identity and appears under the regular sensors. After a successful read,
+compare its dBm value with the gateway card. The old separate
+`current_temperature` entity is removed; the existing `temperature` entity now represents the
 current reading. Home Assistant continues recording its own history. The
 device manufacturer is shown as **BartjeB**. Your own display settings take
 precedence; you do not need to remove and re-add the device.

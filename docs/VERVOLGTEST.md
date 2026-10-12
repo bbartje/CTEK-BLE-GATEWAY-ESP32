@@ -4,37 +4,39 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
 ## Huidige stand voor eigenaar en meelezers
 
-De eigenaar heeft gekozen voor compacte kaarten met alleen naam, spanning en
-meettijd direct zichtbaar. Beta.8 zet temperatuur, status, tellers, bediening,
-logboeken en sensorinstellingen onder `Details en instellingen`, standaard
-ingeklapt. De beta.7-correctie voor lege plekken achter `+` blijft behouden.
-Installatie en hardwaretest van beta.8 zijn nog niet bevestigd.
+De eigenaar heeft gevraagd de Bluetooth-ontvangststerkte te herstellen in
+Home Assistant en direct zichtbaar te maken. Beta.9 herstelt de RSSI-sensor en
+zet de ontvangst in dBm naast spanning en meettijd op de compacte kaarten.
+Temperatuur, bediening en instellingen blijven ingeklapt; lege plekken staan
+achter `+`. Installatie en hardwaretest van beta.9 zijn nog niet bevestigd.
 
 | Onderdeel | Vastgelegde stand |
 |---|---|
-| Code en flashpakket beta.8 | Nieuw pakket in `firmware/releases/0.2.0-beta.8/`; eerdere pakketten blijven beschikbaar. |
-| OTA-download | Beta.8 bevat de compacte kaarten en de correctie van de plusknop. |
-| Laatste terugmelding van de ESP32 | OTA tijdens de beta.6-test uitgevoerd; lege vierde sensorplek zichtbaar. Versienummer op de pagina niet apart gemeld. |
+| Code en flashpakket beta.9 | Nieuw pakket in `firmware/releases/0.2.0-beta.9/`; eerdere pakketten blijven beschikbaar. |
+| OTA-download | Beta.9 bevat RSSI in Home Assistant en direct op de compacte sensorkaart. |
+| Laatste terugmelding | Bluetooth-ontvangststerkte ontbreekt in Home Assistant en moet terugkomen; huidig firmwareversienummer niet apart gemeld. |
 | Eerder hardwarebewijs | Eén volledige uitlezing van sensorplek 3 met beta.4 en ontvangst in Home Assistant. |
-| Volgende stap | Eigenaar installeert beta.8, controleert de compacte kaarten en de plusknop en vervolgt de acceptatietest. |
+| Volgende stap | Eigenaar installeert beta.9 en vergelijkt RSSI op de kaart en in Home Assistant na een geslaagde uitlezing. |
 
-Begin bij de [OTA-download voor beta.8](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.8/ctek-esp32-wroom-32-ota.bin)
+Begin bij de [OTA-download voor beta.9](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.9/ctek-esp32-wroom-32-ota.bin)
 en de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
-Lees voor de wijzigingen de [releasenotities](RELEASE_0.2.0-beta.8.md),
+Lees voor de wijzigingen de [releasenotities](RELEASE_0.2.0-beta.9.md),
 voor de bekende aandachtspunten het
 [kwaliteitsrapport van beta.6](../KWALITEITSRAPPORT-2026-10-12.md) en voor de controles de
 [acceptatietest](ACCEPTATIETEST.md). Lege testvakken betekenen **niet getest**.
-De softwarecontroles zijn geslaagd; de fysieke beta.8-test en externe
+De softwarecontroles zijn geslaagd; de fysieke beta.9-test en externe
 acceptatie staan nog open. Er is nog geen stabiele versie 1.0.0 vrijgegeven.
 
 ## Opgeslagen firmware
 
-Nieuwste versie: **0.2.0-beta.8**, voor ESP32-WROOM-32 met 4 MB flash.
+Nieuwste versie: **0.2.0-beta.9**, voor ESP32-WROOM-32 met 4 MB flash.
 Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 
-- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.8/`; de ZIP
+- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.9/`; de ZIP
   staat één map hoger. De OTA-download is direct beschikbaar vanuit de
-  repository. Zie [de releasenotities](RELEASE_0.2.0-beta.8.md).
+  repository. Zie [de releasenotities](RELEASE_0.2.0-beta.9.md).
+- Het eerdere beta.8-pakket is bewaard in commit `a4d4f1a`; de publieke
+  OTA-download is byte voor byte gelijk aan het gecontroleerde bestand.
 - Het eerdere beta.7-pakket is bewaard in commit `49d6784`; de publieke
   OTA-download is byte voor byte gelijk aan het gecontroleerde bestand.
 - Het eerdere beta.6-pakket blijft beschikbaar; de bijbehorende code en
@@ -60,6 +62,8 @@ Beta.7 verbergt ook de eerste lege sensorplek achter `+`, zodat drie ingestelde
 sensoren geen leeg vierde formulier tonen.
 Beta.8 klapt de gegevens en bediening van ingestelde sensoren in en toont
 alleen naam, spanning en lokale meettijd op de kaart.
+Beta.9 voegt Bluetooth-ontvangst toe aan die kaart en herstelt de gewone
+Home Assistant-sensor `Bluetooth-signaal`, met hetzelfde RSSI-ID als vroeger.
 De softwarelogica is niet hetzelfde als hardwarebewijs: de live BLE-punten,
 herhaald uitlezen, MQTT-ontvangst, herstel-login en OTA moeten op de ESP32 nog
 worden bevestigd.
@@ -69,7 +73,7 @@ via het setupnetwerk; instellingen, diagnostics en OTA vereisen het eigen
 wachtwoord. Ook zijn de tijdzone-overwrite, het verkeerd benoemen van
 historische spanning en de multipart-parserkwetsbaarheid gecorrigeerd.
 Gebruik [de acceptatietest](ACCEPTATIETEST.md) voor de laatste eigen test.
-Beta.8 blijft een testkandidaat; de volgende fase is een beperkte externe bèta,
+Beta.9 blijft een testkandidaat; de volgende fase is een beperkte externe bèta,
 en pas daarna kan een stabiele 1.0.0 volgen. De volledige fysieke
 acceptatieuitslag is nog niet vastgelegd.
 
@@ -102,6 +106,11 @@ De compacte kaarten in beta.8 gebruiken HTML-uitklapvelden van de browser.
 De ESP32-build en pakketcontrole controleren de bijbehorende firmware; de
 layout, lokale tijd en uitklapbediening moeten nog op de echte gateway worden
 bevestigd.
+
+De beta.9-telemetrietest controleert ook dat gewone RSSI-waarden bruikbaar
+blijven en NimBLE's foutwaarde `0` en onbekend-marker `127` niet als echte
+ontvangststerkte worden gebruikt. De herstelde Home Assistant-entiteit en
+de echte kaartwaarde moeten nog op de gateway worden bevestigd.
 
 ## Bewijs uit de fysieke test
 
@@ -206,18 +215,28 @@ waarde wordt als verouderd gemarkeerd. De meettijd is de laatste geslaagde
 uitlezing in de gekozen lokale tijdzone. Er is nog geen fysieke uitslag voor
 de nieuwe layout ontvangen.
 
-## Eerstvolgende test: beta.8 op hardware controleren
+## Herstel Bluetooth-ontvangst in beta.9
 
-1. Installeer beta.8 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
+Op 12 oktober vraagt de eigenaar de ontvangststerkte terug in Home Assistant
+en direct in de eerste weergave. De waarde werd nog gemeten en meegestuurd,
+maar beta.6–8 verwijderden het RSSI-Discoverybericht. Beta.9 publiceert opnieuw
+`Bluetooth-signaal` met dezelfde identiteit, eenheid dBm en nul decimalen,
+als gewone sensor. De gatewaykaart toont de waarde bij de laatste geslaagde
+uitlezing; −60 dBm is sterker dan −90 dBm. Ontbrekende RSSI wordt niet als
+0 dBm getoond. Er is nog geen fysieke beta.9-uitslag ontvangen.
+
+## Eerstvolgende test: beta.9 op hardware controleren
+
+1. Installeer beta.9 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
    Pauzeer het uitlezen, wacht tot de lopende poging klaar is en upload de
-   OTA-bin. Controleer na herstart versie **0.2.0-beta.8** en het behoud van
+   OTA-bin. Controleer na herstart versie **0.2.0-beta.9** en het behoud van
    wifi-, MQTT- en sensorinstellingen en je eigen wachtwoord.
 2. Controleer bij drie ingestelde sensoren dat plek 4 eerst verborgen is en
    `+` zichtbaar. Klik op `+`: alleen die lege plek moet verschijnen. Vernieuw
    zonder die plek op te slaan: de lege plek moet weer verborgen zijn en de
    drie bestaande sensoren moeten zichtbaar blijven.
-3. Controleer bij iedere ingestelde sensor dat alleen naam, spanning en
-   meettijd zichtbaar zijn. Open `Details en instellingen` en controleer
+3. Controleer bij iedere ingestelde sensor dat naam, spanning, Bluetooth-ontvangst
+   en meettijd zichtbaar zijn. Open `Details en instellingen` en controleer
    temperatuur, status, tellers, `Nu uitlezen`, BLE-log en instellingen.
    Vernieuw: de kaart moet weer ingeklapt zijn. Controleer ook op je telefoon
    en met Nederlands, Engels en Duits.
@@ -225,9 +244,11 @@ de nieuwe layout ontvangen.
    en wacht op een afgeronde poging met **Meting ontvangen** in de details.
    Controleer live-spanning op de kaart, temperatuur in de details en beide
    waarden in Home Assistant.
-5. Controleer de lage-spanningsstatus, `BartjeB` bij apparaatinfo en het opruimen
-   van de oude dubbele temperatuur- en RSSI-entiteiten. Eigen Home
-   Assistant-weergaveprecisie blijft leidend. Controleer ook de lokale tijd.
+5. Controleer `Bluetooth-signaal` in Home Assistant en vergelijk de dBm-waarde
+   met de gateway na dezelfde geslaagde uitlezing. Controleer ook de
+   lage-spanningsstatus, `BartjeB`, het opruimen van de oude dubbele
+   temperatuur-entiteit en de lokale tijd. Eigen Home
+   Assistant-weergaveprecisie blijft leidend.
 6. Laat meerdere automatische uitleesrondes lopen. Controleer dat de geslaagde
    teller oploopt en Home Assistant verse updates ontvangt. Noteer afstand en
    scan-signaalsterkte voor de werkende opstelling.

@@ -73,8 +73,8 @@ bool lowDiscovery(size_t slot) {
 bool publishDiscovery(size_t slot) {
   bool success = discovery(slot, "voltage", "Actuele spanning", "V", "voltage", 2);
   success = discovery(slot, "temperature", "Actuele temperatuur", "°C", "temperature", 1) && success;
-  for (const char* retired : {"current_temperature", "rssi"})
-    success = mqtt.publish(discoveryTopic(slot, "sensor", retired).c_str(), "", true) && success;
+  success = discovery(slot, "rssi", "Bluetooth-signaal", "dBm", "signal_strength", 0) && success;
+  success = mqtt.publish(discoveryTopic(slot, "sensor", "current_temperature").c_str(), "", true) && success;
   return lowDiscovery(slot) && success;
 }
 
@@ -90,7 +90,8 @@ bool publishReading(size_t slot) {
   if (values.lowVoltageValid) doc["low_voltage"] = values.lowVoltage;
   else doc["low_voltage"] = nullptr;
   doc["low_voltage_threshold"] = config.lowVoltage;
-  doc["rssi"] = state.rssi;
+  if (ctek::rssiAvailable(state.rssi)) doc["rssi"] = state.rssi;
+  else doc["rssi"] = nullptr;
   doc["source"] = result.currentVoltageValid ? "live" : "history";
   doc["sample_age_seconds"] = readingAge(slot);
   if (state.readEpoch) doc["last_successful_read"] = state.readEpoch;

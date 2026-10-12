@@ -2,6 +2,10 @@
 #include "ctek_session.h"
 
 namespace ctek {
+inline bool rssiAvailable(int rssi) {
+  // NimBLEClient::getRssi() returns 0 on error; the controller uses 127 for unknown RSSI.
+  return rssi != 0 && rssi != 127;
+}
 struct Telemetry {
   bool fresh = false;
   bool lowVoltage = false;
