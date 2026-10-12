@@ -1,8 +1,8 @@
 {
   "version": "0.2.0-beta.9",
-  "built_at_utc": "2026-10-12T11:05:21.089194+00:00",
-  "base_commit": "a4d4f1adaba4a45e2bb6a05af55b07d375b5d270",
-  "firmware_source_sha256": "5b160994f2a66e2475fe0308b245b4b6002a4346a95e9832abb60729420463e0",
+  "built_at_utc": "2026-10-12T11:34:48.921186+00:00",
+  "base_commit": "f2fa63ffaddc104a28590f60bf19b8506ddac743",
+  "firmware_source_sha256": "4cacf3e737621a095f1d72ae42036071a16707934799c80627d5ff79e91746c7",
   "chip": "ESP32-D0WD-V3 / ESP32-WROOM-32",
   "flash_bytes": 4194304,
   "flash_mode": "DIO",

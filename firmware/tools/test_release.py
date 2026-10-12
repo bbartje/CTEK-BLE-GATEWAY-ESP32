@@ -30,8 +30,8 @@ def rejected(function, *arguments):
 assert manifest["version"] == version and manifest["flash_bytes"] == 0x400000
 assert manifest["checks"]["webserver_boundary_guard"] == "passed"
 assert "CVE-2026-42854" in manifest["security_backports"]
-assert (release / "FLASHEN.md").read_bytes() == (root.parent / "docs/FLASHEN.md").read_bytes(), "Flashhandleiding gewijzigd: bouw het pakket opnieuw"
-assert (release / "ACCEPTATIETEST.md").read_bytes() == (root.parent / "docs/ACCEPTATIETEST.md").read_bytes(), "Acceptatietest gewijzigd: bouw het pakket opnieuw"
+for document in ("FLASHEN.md", "ACCEPTATIETEST.md", "TESTER_START.md", "TESTVERSLAG_TEMPLATE.md", "VRIJGAVE.md", f"RELEASE_{version}.md"):
+    assert (release / document).read_bytes() == (root.parent / "docs" / document).read_bytes(), f"Documentatie gewijzigd of ontbreekt: bouw het pakket opnieuw ({document})"
 assert (release / "THIRD_PARTY_NOTICES.md").read_bytes() == (root / "THIRD_PARTY_NOTICES.md").read_bytes(), "Licentienotities gewijzigd: bouw het pakket opnieuw"
 assert validate_image(ota, "ctek-ble-gateway", version)["sha256"] == manifest["files"]["ctek-esp32-wroom-32-ota.bin"]["sha256"]
 assert hashlib.sha256(factory).hexdigest() == manifest["files"]["ctek-esp32-wroom-32-factory.bin"]["sha256"]

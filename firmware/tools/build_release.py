@@ -80,8 +80,8 @@ manifest = {
     "dependencies": {"platformio": "6.1.19", "espressif32": "7.1.3", "arduino_esp32": "2.0.17", "nimble": "2.5.1", "pubsubclient": "2.8.0", "arduinojson": "7.4.3"},
 }
 (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-shutil.copyfile(repository / "docs/FLASHEN.md", output / "FLASHEN.md")
-shutil.copyfile(repository / "docs/ACCEPTATIETEST.md", output / "ACCEPTATIETEST.md")
+for document in ("FLASHEN.md", "ACCEPTATIETEST.md", "TESTER_START.md", "TESTVERSLAG_TEMPLATE.md", "VRIJGAVE.md", f"RELEASE_{version}.md"):
+    shutil.copyfile(repository / "docs" / document, output / document)
 shutil.copyfile(root / "THIRD_PARTY_NOTICES.md", output / "THIRD_PARTY_NOTICES.md")
 licenses = output / "licenses"; licenses.mkdir(exist_ok=True)
 for library, source in [

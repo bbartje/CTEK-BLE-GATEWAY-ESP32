@@ -1,5 +1,11 @@
 # Workshop vibe coding: zo werk je in deze omgeving
 
+Dit document hoort bij de oorspronkelijke React-workshopapp op poort 3000.
+Voor het testen van de **CTEK ESP32-gateway** gebruik je
+[TESTER_START.md](docs/TESTER_START.md) en [FLASHEN.md](docs/FLASHEN.md).
+De ESP32 draait zelfstandig; de tester heeft geen Codespace of openbaar
+gemaakte Codespace-poort nodig.
+
 ## 1. Je ontwikkelomgeving
 
 Je werkt in een Codespace: een complete ontwikkelomgeving in je browser. Je app start vanzelf en verschijnt in een voorbeeldvenster. Zie je hem niet? Open onderin het tabblad **Ports** en klik bij poort 3000 op het wereldbolletje.

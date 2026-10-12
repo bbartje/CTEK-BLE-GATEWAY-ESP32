@@ -27,6 +27,13 @@ hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
 
+Het pakket bevat ook de startgids voor testers, acceptatiechecklist, een leeg
+testverslag en de releasenotities van de gebouwde versie. De pakketcontrole
+vergelijkt deze documenten met de bronnen. Zie de
+[vrijgaveprocedure](../docs/VRIJGAVE.md) voor de vaste GitHub-tag en publicatie
+als bètarelease. Voor deze documentatie-update blijven de beta.9-factory- en
+OTA-bin byte voor byte gelijk aan de eerder gedeelde bestanden.
+
 De dependencies in `platformio.ini` staan vast: espressif32 7.1.3,
 Arduino ESP32-package 4.20017.260907+sha.dcc1105b (core 2.0.17),
 esptool-package 2.41100.260830, NimBLE-Arduino 2.5.1,

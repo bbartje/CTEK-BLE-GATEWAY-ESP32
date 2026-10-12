@@ -9,6 +9,11 @@ ESP32-WROOM-32 / ESP32-D0WD-V3 met 4 MB flash, een stabiele USB-voeding en
 een factory-flash wist bestaande instellingen. Bewaar codes en wachtwoorden
 privé en maak een back-up van Home Assistant.
 
+Een tweede tester begint bij [TESTER_START.md](TESTER_START.md) en gebruikt een
+eigen kopie van [TESTVERSLAG_TEMPLATE.md](TESTVERSLAG_TEMPLATE.md). Dezelfde
+controlecriteria gelden op diens eigen hardware. Noteer apart welke controles
+de eigenaar en de tweede tester werkelijk hebben uitgevoerd.
+
 ## Testvolgorde
 
 | Klaar | Controle | Geslaagd als |
@@ -67,3 +72,5 @@ wachtwoorden of oude seriële opstartlogs zonder controle.
 
 Een Git-push met beta.9-code en bestanden bewaart de testkandidaat. Het is geen
 verklaring dat de fysieke acceptatietest of stabiele vrijgave al is geslaagd.
+Een GitHub-bètarelease met vaste tag maakt de gecontroleerde versie deelbaar;
+zie [de vrijgaveprocedure](VRIJGAVE.md).

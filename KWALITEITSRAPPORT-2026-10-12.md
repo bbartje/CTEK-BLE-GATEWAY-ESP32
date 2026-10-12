@@ -8,6 +8,12 @@ sensoradressen, sensornamen, tijden en lokaal opgeslagen verbindingsgegevens.
 
 ## Samenvatting
 
+Dit rapport bewaart de toets van **beta.6**. De actuele firmware is beta.9;
+de latere RSSI-correctie, compacte kaarten, bètarelease en testerprocedures
+staan in de [actuele teststatus](docs/VERVOLGTEST.md). Die latere wijzigingen
+zijn geen nieuwe volledige kwaliteitstoets. De hardwareacceptatie staat nog
+open totdat de eigenaar en de externe tester hun uitslagen hebben gemeld.
+
 De gateway leest maximaal vier CTEK Battery Sense-sensoren om de beurt en stuurt
 metingen naar de eigen MQTT-broker en Home Assistant. De beta.6-code en het
 bijbehorende flashpakket zijn gecontroleerd, verbeterd en naar GitHub gepusht

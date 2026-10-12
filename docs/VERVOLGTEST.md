@@ -8,17 +8,20 @@ De eigenaar heeft gevraagd de Bluetooth-ontvangststerkte te herstellen in
 Home Assistant en direct zichtbaar te maken. Beta.9 herstelt de RSSI-sensor en
 zet de ontvangst in dBm naast spanning en meettijd op de compacte kaarten.
 Temperatuur, bediening en instellingen blijven ingeklapt; lege plekken staan
-achter `+`. Installatie en hardwaretest van beta.9 zijn nog niet bevestigd.
+achter `+`. De eigenaar gaat beta.9 nu testen en wil daarna een tweede tester
+uitnodigen. De installatie en volledige hardwareuitslag zijn nog niet
+bevestigd. De startgids en testprocedure voor die tweede tester zijn voorbereid.
 
 | Onderdeel | Vastgelegde stand |
 |---|---|
-| Code en flashpakket beta.9 | Nieuw pakket in `firmware/releases/0.2.0-beta.9/`; eerdere pakketten blijven beschikbaar. |
-| OTA-download | Beta.9 bevat RSSI in Home Assistant en direct op de compacte sensorkaart. |
-| Laatste terugmelding | Bluetooth-ontvangststerkte ontbreekt in Home Assistant en moet terugkomen; huidig firmwareversienummer niet apart gemeld. |
+| Code en flashpakket beta.9 | Op GitHub; de vaste bètarelease bevat de gecontroleerde binaries en de volledige testerdocumentatie. |
+| OTA-download | De vrijgegeven OTA-bin is dezelfde als het bestand dat de eigenaar nu gaat testen. |
+| Laatste terugmelding | Eigenaar kondigt de beta.9-test aan en vraagt documentatie en vrijgave voor een tweede tester; de uitslag volgt nog. |
 | Eerder hardwarebewijs | Eén volledige uitlezing van sensorplek 3 met beta.4 en ontvangst in Home Assistant. |
-| Volgende stap | Eigenaar installeert beta.9 en vergelijkt RSSI op de kaart en in Home Assistant na een geslaagde uitlezing. |
+| Volgende stap | Eigenaar meldt de acceptatieuitslag; daarna krijgt de tweede tester de vaste releaselink en startgids. |
 
-Begin bij de [OTA-download voor beta.9](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.9/ctek-esp32-wroom-32-ota.bin)
+Begin bij de [beta.9-bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.9)
+en de [OTA-download](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.9/ctek-esp32-wroom-32-ota.bin)
 en de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
 Lees voor de wijzigingen de [releasenotities](RELEASE_0.2.0-beta.9.md),
 voor de bekende aandachtspunten het
@@ -27,14 +30,28 @@ voor de bekende aandachtspunten het
 De softwarecontroles zijn geslaagd; de fysieke beta.9-test en externe
 acceptatie staan nog open. Er is nog geen stabiele versie 1.0.0 vrijgegeven.
 
+## Tweede tester voorbereiden
+
+De eigenaar deelt na de eigen uitslag zelf de vaste release met de tweede
+tester. [TESTER_START.md](TESTER_START.md) beschrijft benodigdheden, installatie,
+één sensor testen, de bekende beperkingen en het terugmelden van fouten.
+[TESTVERSLAG_TEMPLATE.md](TESTVERSLAG_TEMPLATE.md) begint met alle controles
+op **niet getest**. Er is nog geen uitnodiging verstuurd of externe uitslag
+ontvangen. De tweede tester gebruikt eigen hardware, netwerk en Home Assistant.
+
+De [vrijgaveprocedure](VRIJGAVE.md) maakt onderscheid tussen bestanden bewaren,
+een GitHub-bètarelease publiceren, de eigen hardwaretest, externe tests en een
+stabiele 1.0.0. Deze publicatie bewaart beta.9 met bijgewerkte documentatie;
+de OTA- en factory-bin blijven byte voor byte gelijk aan de al gedeelde versie.
+
 ## Opgeslagen firmware
 
 Nieuwste versie: **0.2.0-beta.9**, voor ESP32-WROOM-32 met 4 MB flash.
 Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 
-- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.9/`; de ZIP
-  staat één map hoger. De OTA-download is direct beschikbaar vanuit de
-  repository. Zie [de releasenotities](RELEASE_0.2.0-beta.9.md).
+- De bestanden staan in `firmware/releases/0.2.0-beta.9/`; de ZIP staat één map
+  hoger. De vaste tag is `v0.2.0-beta.9`; de GitHub-release is gemarkeerd als
+  **prerelease**. Zie [de releasenotities](RELEASE_0.2.0-beta.9.md).
 - Het eerdere beta.8-pakket is bewaard in commit `a4d4f1a`; de publieke
   OTA-download is byte voor byte gelijk aan het gecontroleerde bestand.
 - Het eerdere beta.7-pakket is bewaard in commit `49d6784`; de publieke
