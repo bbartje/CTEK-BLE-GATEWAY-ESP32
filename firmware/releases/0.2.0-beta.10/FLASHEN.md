@@ -1,21 +1,20 @@
 # Flash and Set Up the Gateway Without PlatformIO or PuTTY
 
 For **ESP32-WROOM-32, ESP32-D0WD-V3 revision 3, with 4 MB flash** only.
-Firmware **0.2.0-beta.10** is the new interface test candidate and still needs testing
+Firmware **0.2.0-beta.10** is a published prerelease and still needs testing
 with your physical Battery Sense units. This image is not for ESP32-C3/S3/S2.
 
 For a first independent test, begin with the
 [tester start guide](TESTER_START.md) (Dutch) and keep a copy of the
 [feedback template](TESTVERSLAG_TEMPLATE.md). Download the
-[beta.10 package](../firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.10.zip)
-from the repository (on GitHub, use the raw-file download button). Beta.10
-has no published GitHub release yet. The fixed beta.9 release remains available
-for its existing hardware test.
+[beta.10 package](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-0.2.0-beta.10.zip)
+from the fixed [beta.10 release](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10).
+Earlier releases remain available with their original files.
 
 ## 1. First Flash with the ESP32 Flash Download Tool
 
 Download the official [Espressif Flash Download Tool](https://www.espressif.com/en/support/download/other-tools).
-Download the [complete factory image](../firmware/releases/0.2.0-beta.10/ctek-esp32-wroom-32-factory.bin)
+Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-factory.bin)
 or extract the ZIP from `firmware/releases/`. For USB installation, use
 **ctek-esp32-wroom-32-factory.bin**. PlatformIO is not needed to flash it.
 
@@ -170,7 +169,7 @@ within range and confirm that it recovers without restarting the board.
 
 ## 5. Update Firmware over Wi-Fi
 
-For an update from beta.1 through beta.9, [download the beta.10 OTA image](../firmware/releases/0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin).
+For an update from beta.1 through beta.9, [download the beta.10 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin).
 
 1. Open the gateway page and select **Update firmware** (older versions:
    **Pause polling and update firmware**). Wait

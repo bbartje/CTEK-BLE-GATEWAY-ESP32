@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste testkandidaat staat in `releases/0.2.0-beta.10/`; de ZIP staat één niveau
+De nieuwste bètarelease staat in `releases/0.2.0-beta.10/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -32,8 +32,11 @@ testverslag en de releasenotities van de gebouwde versie. De pakketcontrole
 vergelijkt deze documenten met de bronnen. Zie de
 [vrijgaveprocedure](../docs/VRIJGAVE.md) voor de vaste GitHub-tag en publicatie
 als bètarelease. Beta.10 heeft nieuwe binaries voor de interfacewijziging;
-beta.9 en zijn gepubliceerde release blijven bewaard. Beta.10 is nog geen
-gepubliceerde GitHub-release en heeft nog geen fysieke acceptatie.
+beta.9 en zijn gepubliceerde release blijven bewaard. Download de vaste
+[beta.10-release](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10)
+of rechtstreeks de [OTA-bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin).
+De documentatievrijgave behoudt de eerder gebouwde beta.10-binaries;
+de fysieke acceptatie staat nog open.
 
 De dependencies in `platformio.ini` staan vast: espressif32 7.1.3,
 Arduino ESP32-package 4.20017.260907+sha.dcc1105b (core 2.0.17),

@@ -1,6 +1,6 @@
 # Start hier: CTEK-gateway testen
 
-Testkandidaat **0.2.0-beta.10** · Eigenaar en aanspreekpunt: **bbartje**.
+Bètarelease **0.2.0-beta.10** · Eigenaar en aanspreekpunt: **bbartje**.
 
 Dit is een beperkte bètatest met een eigen ESP32, CTEK-sensor en thuisnetwerk.
 De softwarecontroles zijn geslaagd. De volledige praktijktest van de eigenaar
@@ -39,11 +39,12 @@ herstelprocedure staat in [FLASHEN.md](FLASHEN.md).
 
 ## Kies de juiste download
 
-Het [beta.10-pakket in de repository](../firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.10.zip)
+Het [complete beta.10-pakket](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-0.2.0-beta.10.zip)
 bevat de binaries, deze instructies, de controles en een leeg testverslag.
-Gebruik op GitHub de knop voor downloaden van het ruwe bestand. Beta.10
-is nog niet als GitHub-release gepubliceerd. De vaste beta.9-release blijft
-beschikbaar voor de eerder begonnen test.
+Download dit uit de vaste [beta.10-bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10).
+Daar vind je ook de losse [OTA-bin voor wifi-updates](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin)
+en [factory-bin voor USB](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-factory.bin).
+Oudere releases en de bijbehorende pakketten blijven beschikbaar.
 
 | Jouw situatie | Bestand | Installatie |
 |---|---|---|

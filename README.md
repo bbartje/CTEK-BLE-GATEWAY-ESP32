@@ -1,120 +1,90 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Owner and maintainer: **bbartje**. New test candidate: **0.2.0-beta.10**.
+Owner and maintainer: **bbartje**. Firmware version: **0.2.0-beta.10**.
 
-Beta.10 adds collapsed **Gateway settings**, a toolbar that stays at the top
-while scrolling, a cream/petrol/orange retro design, and a visible repository
-link. Read the [beta.10 notes](docs/RELEASE_0.2.0-beta.10.md).
+[Open the beta.10 release](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10),
+download the [Wi-Fi update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin),
+[complete factory image (.bin, flash address 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-factory.bin),
+or [firmware package (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-0.2.0-beta.10.zip).
+Follow the [installation guide](docs/FLASHEN.md). The ZIP includes the tester
+start guide, acceptance checklist, feedback template, release notes, checksums,
+build information, and library licenses. Earlier releases and their original
+packages remain available, including [beta.9](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.9).
+
+Beta.10 starts with **Gateway settings** collapsed. Open it to change Wi-Fi,
+MQTT, time zone, polling interval, warning threshold, or the admin password.
+Refresh, Bluetooth scan, diagnostics, and firmware update stay at the top while
+scrolling. A cream/petrol/orange retro design and a visible **BartjeB / GitHub**
+link complete the interface. Read the [beta.10 release notes](docs/RELEASE_0.2.0-beta.10.md).
 Open [the offline interface preview](docs/VOORBEELD_INTERFACE.html) in a browser
 to try the layout with fictional data, without a connected gateway.
-Download the [beta.10 Wi-Fi update](firmware/releases/0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin),
-[factory image](firmware/releases/0.2.0-beta.10/ctek-esp32-wroom-32-factory.bin),
-or [complete package](firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.10.zip).
-These files are stored in the repository; beta.10 has no published GitHub
-release yet and its physical acceptance is pending. Earlier releases are kept.
 
-## Published beta.9
+Each configured card shows **name, live voltage, Bluetooth signal strength,
+and last successful measurement time**. Temperature, read status, counters,
+**Read now**, logs, and sensor settings are under **Details and settings**,
+closed by default. Missing voltage or signal strength is shown as unavailable;
+old values are labelled stale. Empty sensor forms appear only after clicking
+**+**, one at a time. Dutch, English, and German are supported; the browser
+remembers the language and measurement times use the configured local time zone.
+Bluetooth signal strength (RSSI) is in dBm from the last successful read;
+−60 dBm is stronger than −90 dBm.
 
-[Open the beta.9 release](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.9),
-download the [Wi-Fi update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.9/ctek-esp32-wroom-32-ota.bin),
-[complete factory image (.bin, flash address 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.9/ctek-esp32-wroom-32-factory.bin),
-or [firmware package (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.9/ctek-esp32-wroom-32-0.2.0-beta.9.zip).
-Follow the [installation guide](docs/FLASHEN.md). The ZIP includes the start
-guide, acceptance checklist, feedback template, release notes, checksums,
-build information, and library licenses. Earlier beta packages remain in the
-repository.
+The gateway publishes live voltage, current temperature, Bluetooth signal
+strength, and low-voltage status to Home Assistant. The device is identified
+as **BartjeB**. Historical records remain available on the MQTT history topic;
+they do not automatically backfill the normal Home Assistant graphs.
+The [ESPHome comparison](docs/VERGELIJKING_ESPHOME_CTEK.md) describes a possible
+larger history import. Beta.10 retains the existing 12/48-record limits.
 
-**Beta.9 independent testers:** begin with [the bundled beta.9 tester start guide](firmware/releases/0.2.0-beta.9/TESTER_START.md)
-(Dutch), then use [the bundled feedback template](firmware/releases/0.2.0-beta.9/TESTVERSLAG_TEMPLATE.md).
-The owner is completing the hardware test and will confirm when the second
-tester should start. The full installation guide is in English.
+**Release status (October 12, 2026):** beta.10 is delivered as a GitHub
+prerelease with fixed tag `v0.2.0-beta.10`. The source and complete installation
+package pass the software checks. The OTA and factory images are byte for
+byte identical to the beta.10 files already built for the owner's test;
+this publication completes the release documentation and downloads.
+Physical beta.10 installation, repeated reads, Home Assistant, recovery, and
+OTA acceptance remain pending. The earlier confirmed physical result is a
+complete read of **sensor slot 3 on beta.4**, including two history records
+and reception in Home Assistant. No full beta.10 acceptance is inferred from it.
 
-Beta.9 restores **Bluetooth signal strength (RSSI)** in Home Assistant and
-directly on each compact sensor card, alongside **name, voltage, and last
-successful measurement time**. The value is in dBm from the last successful
-read; −60 dBm is stronger than −90 dBm. Missing signal strength is shown as
-unavailable and an old value is labelled stale. Temperature, read status, counters,
-**Read now**, logs, and sensor settings are under **Details and settings**, closed
-by default. Missing live voltage is shown as unavailable; an old reading is
-marked stale. Every unused slot still appears only after clicking **+**, one
-at a time, as corrected in beta.7.
-
-The gateway publishes **live voltage**, **current temperature**, **Bluetooth
-signal strength**, and the low-voltage status to Home Assistant.
-Historical measurements remain available on the
-gateway's history topic, but are no longer separate Home Assistant sensor
-entities. The device is identified as **BartjeB**. The web interface supports
-Dutch, English, and German, remembers the selected language, and displays the
-last successful read in the selected local time zone. A two-minute recovery
-access point is available after startup; existing settings are not erased.
-The public recovery login works only on that setup network and only to choose
-a new admin password. It cannot open configuration, diagnostics, or firmware
-uploads. Anyone nearby during the window can still reset the password; use
-recovery in a private setting. Normal network access always requires your own
-admin password.
-
-**Published beta.9 status (October 12, 2026):** beta.9 is published as a GitHub prerelease
-with a fixed version tag and verified files. The firmware binaries match those
-already provided for the owner's test; this update completes the documentation
-and tester package. The owner is starting the hardware test; installation and
-the complete acceptance results have not yet been confirmed. The second
-tester's instructions are ready and their results are still pending.
-
-For an overview, read the [beta.9 release notes](docs/RELEASE_0.2.0-beta.9.md).
-The [quality report for beta.6](KWALITEITSRAPPORT-2026-10-12.md) and
-[test status and next steps](docs/VERVOLGTEST.md) are in Dutch and record the
-software checks, known limitations, and outstanding hardware tests. Use the
-[beta.9 acceptance checklist](firmware/releases/0.2.0-beta.9/ACCEPTATIETEST.md) before inviting external testers.
-Keep the beta label during external testing; release 1.0.0 only after
+The [test status](docs/VERVOLGTEST.md) and
+[beta.6 quality report](KWALITEITSRAPPORT-2026-10-12.md) record evidence and
+limitations. Keep the beta label during testing; release 1.0.0 only after
 installation, repeated reads, Home Assistant, recovery, and updates have passed
 on testers' own devices.
 
-On October 12, 2026, the first complete physical read was confirmed for **sensor
-slot 3 on beta.4**: connection, unlock, metadata reads, and receipt of two history
-records all succeeded. The admin page displayed voltage and temperature, and
-this confirmed the saved code for that sensor. Voltage and temperature were
-also reported in Home Assistant. Repeated reads, the other sensor slots, and
-the complete beta.9 acceptance checklist still need physical confirmation.
-
-**PlatformIO and PuTTY are not required to install this firmware.** For the
-first factory flash, connect to `CTEK-Setup-xxxxxx` with the initial password
-**CTEK-Start123**. Open **http://192.168.4.1**, sign in as **admin** with the same
-initial password, and choose a personal password. The board restarts; reconnect
-and sign in with your new password. You can then configure Wi-Fi, MQTT, and
-sensors. A Wi-Fi update preserves your existing admin password; a factory flash
-erases the previous settings.
-
 ## Update an Existing Gateway (OTA)
 
-Download the [beta.10 OTA image](firmware/releases/0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin).
+Download the [beta.10 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin).
 On the gateway page, choose **Update firmware** (older versions:
-**Pause polling and update firmware**), wait for any
-active sensor read to finish, then upload `ctek-esp32-wroom-32-ota.bin`. Keep
-the ESP32 powered until it restarts. Wi-Fi/MQTT settings, sensor configuration,
-and your admin password are preserved. After restarting, check the version is
-**0.2.0-beta.10**. **Gateway settings** should start closed; open it to change
-configuration. Refresh, Bluetooth scan, diagnostics, and firmware update stay
-available in the toolbar while scrolling. Each configured card should show name, voltage, Bluetooth
-signal, and measurement time, with **Details and settings** closed. After a
-successful reading, check **Bluetooth-signaal** under the device's sensors in
-Home Assistant. Empty sensor forms
-appear only after clicking **+**.
-Do not upload the factory image through
-this page. See [the complete OTA instructions](docs/FLASHEN.md#5-update-firmware-over-wi-fi)
-for update checks, recovery, and troubleshooting.
+**Pause polling and update firmware**), wait for the active sensor read to
+finish, then upload `ctek-esp32-wroom-32-ota.bin`. Keep the ESP32 powered until
+it restarts. Wi-Fi/MQTT settings, sensors, and the admin password are preserved.
+Confirm version **0.2.0-beta.10**, closed **Gateway settings**, and the toolbar
+while scrolling. Check a new reading on the gateway and in Home Assistant.
+Do not upload the factory image here. See the
+[complete OTA instructions](docs/FLASHEN.md#5-update-firmware-over-wi-fi).
+
+**PlatformIO and PuTTY are not required to install this firmware.** For a
+first factory flash, connect to `CTEK-Setup-xxxxxx` with the initial password
+**CTEK-Start123**. Open **http://192.168.4.1**, sign in as **admin** with the
+same initial password, and choose a personal password. After restarting,
+reconnect with your new password, then open **Gateway settings** to configure
+Wi-Fi/MQTT and add sensors through **+**. A factory flash erases old settings.
+A two-minute password recovery network is available after startup; the public
+recovery login only allows replacing the admin password on that setup network.
+Normal configuration, diagnostics, and uploads require your own password.
 
 ## Start a Second Hardware Test
 
-After recording the owner's results, share the fixed
-[beta.9 release link](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.9)
-and [bundled beta.9 tester start guide](firmware/releases/0.2.0-beta.9/TESTER_START.md). Each tester uses their own
-ESP32, sensors, network, MQTT broker, and Home Assistant. They report results
-with [the bundled beta.9 template](firmware/releases/0.2.0-beta.9/TESTVERSLAG_TEMPLATE.md), including items not tested
-and any help needed to follow the guide. Keep codes and passwords private;
-share only anonymized logs and results.
-
-The [release procedure](docs/VRIJGAVE.md) explains package checks, version tags,
-prereleases, hardware acceptance, and the steps before a stable 1.0.0.
+After recording the owner's [acceptance results](docs/ACCEPTATIETEST.md),
+share the fixed [beta.10 release](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10)
+and [tester start guide](docs/TESTER_START.md) (Dutch). Each tester uses their
+own ESP32, sensors, network, MQTT broker, and Home Assistant. They report
+results with [the template](docs/TESTVERSLAG_TEMPLATE.md), including items not
+tested and any help needed to follow the guide. Keep codes and passwords
+private; share only anonymized logs and results. The second tester's results
+are still pending. The [release procedure](docs/VRIJGAVE.md) explains packaging,
+fixed version tags, prereleases, and the checks before a stable 1.0.0.
 
 ## What Does This Project Do?
 

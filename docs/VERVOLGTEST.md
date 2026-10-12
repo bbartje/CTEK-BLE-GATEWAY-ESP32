@@ -4,13 +4,23 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
 ## Huidige stand voor eigenaar en meelezers
 
-Nieuwe kandidaat: **beta.10**, met ingeklapte gatewayinstellingen, vaste
+Actuele bètarelease: **beta.10**, met ingeklapte gatewayinstellingen, vaste
 actiebalk, retrostijl en repositorylink. Zie [de releasenotities](RELEASE_0.2.0-beta.10.md)
-en het pakket in `firmware/releases/0.2.0-beta.10/`. Beta.10 heeft nog geen
-gepubliceerde GitHub-release of fysieke acceptatie. De onderstaande beta.9-
-stand blijft de overdracht voor de eerder begonnen hardwaretest. De nieuwe
+en de vaste [GitHub-release](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10).
+De eigenaar heeft bouwen, bijwerken en vrijgeven aangevraagd. De OTA- en
+factory-bin behouden de eerder gecontroleerde beta.10-inhoud; de documentatie
+en het pakket zijn bijgewerkt. De fysieke acceptatie staat nog open. De onderstaande beta.9-
+stand is bewaard als eerdere overdracht. De nieuwe
 [ESPHome-vergelijking](VERGELIJKING_ESPHOME_CTEK.md) is brononderzoek; grotere
 historie-import is nog een vervolgvoorstel.
+
+Download [de beta.10 OTA-bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin)
+en volg [de wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
+Controleer na installatie versie **0.2.0-beta.10**, behouden instellingen,
+ingeklapte gatewayinstellingen, de actiebalk en nieuwe sensormetingen.
+Leg de echte uitslag vast met [de acceptatiechecklist](ACCEPTATIETEST.md) en
+[het testverslag](TESTVERSLAG_TEMPLATE.md). De tweede tester gebruikt daarna
+dezelfde vaste release en [startgids](TESTER_START.md).
 
 ## Bewaarde stand van beta.9
 
@@ -40,7 +50,7 @@ voor de bekende aandachtspunten het
 De softwarecontroles zijn geslaagd; de fysieke beta.9-test en externe
 acceptatie staan nog open. Er is nog geen stabiele versie 1.0.0 vrijgegeven.
 
-## Tweede tester voorbereiden
+## Eerdere voorbereiding van tweede tester (beta.9)
 
 De eigenaar deelt na de eigen uitslag zelf de vaste release met de tweede
 tester. [TESTER_START.md](TESTER_START.md) beschrijft benodigdheden, installatie,
@@ -54,9 +64,9 @@ een GitHub-bètarelease publiceren, de eigen hardwaretest, externe tests en een
 stabiele 1.0.0. Deze publicatie bewaart beta.9 met bijgewerkte documentatie;
 de OTA- en factory-bin blijven byte voor byte gelijk aan de al gedeelde versie.
 
-## Opgeslagen firmware
+## Bewaarde firmware vóór beta.10
 
-Nieuwste versie: **0.2.0-beta.9**, voor ESP32-WROOM-32 met 4 MB flash.
+Bewaarde eerdere versie: **0.2.0-beta.9**, voor ESP32-WROOM-32 met 4 MB flash.
 Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 
 - De bestanden staan in `firmware/releases/0.2.0-beta.9/`; de ZIP staat één map

@@ -1,9 +1,10 @@
 # CTEK ESP32 Gateway 0.2.0-beta.10
 
-Testkandidaat voor ESP32-WROOM-32 met 4 MB flash. Eigenaar: **bbartje**.
+Bètarelease voor ESP32-WROOM-32 met 4 MB flash. Eigenaar: **bbartje**.
 Deze versie richt zich op de beheerinterface. Beta.9 en zijn gepubliceerde
-release blijven beschikbaar; beta.10 is een nieuw pakket in de repository,
-nog zonder gepubliceerde GitHub-release of fysieke acceptatie.
+release blijven beschikbaar. Beta.10 wordt vrijgegeven met vaste tag
+`v0.2.0-beta.10` en gecontroleerde downloads voor een beperkte praktijktest.
+De fysieke acceptatie van beta.10 staat nog open.
 
 ## Wat is veranderd?
 
@@ -27,7 +28,10 @@ teruggevuld in de normale Home Assistant-grafieken.
 
 ## Bekijken en installeren
 
-Het nieuwe pakket staat in `firmware/releases/0.2.0-beta.10/`; de ZIP staat
+Download de [beta.10-bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10),
+de [wifi-update (OTA)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin),
+of het [complete ZIP-pakket](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-0.2.0-beta.10.zip).
+Het pakket staat ook in `firmware/releases/0.2.0-beta.10/`; de ZIP staat
 één map hoger. Gebruik voor een bestaande gateway uitsluitend
 `ctek-esp32-wroom-32-ota.bin`. De factory-bin is voor USB-installatie op `0x0`
 en wist instellingen. Volg [FLASHEN.md](FLASHEN.md).
@@ -49,7 +53,7 @@ Browsertests gebruiken de daadwerkelijke HTML-fragmenten en browsercode van
 de firmware voor inklappen/openen, behoud van formulierinvoer, de actieknoppen,
 taalkeuze, repositorylink en toevoegen van sensoren. De bestaande protocol-,
 toegangs- en telemetrietests zijn geslaagd, evenals `npm run build`, alle
-15 browsertests/app-tests samen, de ESP32-build en controle van binaries,
+15 tests voor de app en browserbediening, de ESP32-build en controle van binaries,
 controlesommen, ZIP en overeenkomst met de bronnen. De firmware gebruikt
 20,6% van het statische RAM en 61,5% van de applicatiepartitie.
 
@@ -57,6 +61,11 @@ Het HTML-voorbeeld is ook met Chromium gecontroleerd op 1280, 390 en 320 pixels
 breedte, in Nederlands, Engels en Duits: geen horizontale overloop, openen en
 inklappen bewaart invoer, en de actiebalk blijft bij scrollen bovenaan staan.
 Dit is een browsercontrole met fictieve gegevens, geen sensor- of OTA-test.
+
+Deze vrijgave rondt de documentatie en downloads af. De OTA- en factory-bin
+zijn byte voor byte gelijk aan de eerder gebouwde beta.10-bestanden. Het ZIP-
+pakket bevat de bijgewerkte handleiding, testerstartgids, acceptatiechecklist,
+testverslag, releasenotities, controlesommen, bouwmanifest en licenties.
 
 De fysieke beta.10-test, radioverbindingen, Home Assistant en wifi-update
 moeten nog worden bevestigd. Het pakket heeft dezelfde netwerk- en

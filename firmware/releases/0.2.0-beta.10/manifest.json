@@ -1,7 +1,7 @@
 {
   "version": "0.2.0-beta.10",
-  "built_at_utc": "2026-10-12T14:51:50.670861+00:00",
-  "base_commit": "12934112eed55e4d91a328d3dc36b8a8a91f117a",
+  "built_at_utc": "2026-10-12T14:58:54.551890+00:00",
+  "base_commit": "4c8280a830cd82bc6ce850bddf1c4cabbea29c37",
   "firmware_source_sha256": "ae5279a4f21a644a52ace25222b2b2c35e5a6a2a12a00c137ca87639cccffeee",
   "chip": "ESP32-D0WD-V3 / ESP32-WROOM-32",
   "flash_bytes": 4194304,

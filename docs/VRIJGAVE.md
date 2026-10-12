@@ -1,6 +1,6 @@
 # Procedure voor bouwen, bewaren en vrijgeven
 
-Eigenaar en beheerder: **bbartje**. Nieuwe testkandidaat: **0.2.0-beta.10**.
+Eigenaar en beheerder: **bbartje**. Actuele bètarelease: **0.2.0-beta.10**.
 
 ## Wat betekent vrijgegeven?
 
@@ -12,10 +12,11 @@ Eigenaar en beheerder: **bbartje**. Nieuwe testkandidaat: **0.2.0-beta.10**.
 | Tweede tester uitgenodigd | Tester krijgt dezelfde vaste versie en volgt zelfstandig de startgids op eigen hardware. |
 | Stabiele versie 1.0.0 | Eigen en externe installatie-, meet-, herstel- en updatetests zijn geslaagd en de eigenaar heeft dit besloten. |
 
-Beta.9 is als bètarelease gepubliceerd; de eigen praktijktest is nog niet
-volledig bevestigd. Beta.10 staat als nieuw interfacepakket in de repository,
-zonder gepubliceerde versietag/release of fysieke acceptatie. Een publicatie
-vult geen hardwaretestvakjes in.
+Beta.10 wordt met toestemming van de eigenaar gepubliceerd als
+[GitHub-bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.10)
+met vaste tag `v0.2.0-beta.10`. De softwarecontroles zijn geslaagd; de fysieke
+acceptatie staat nog open. Beta.9 en oudere releases blijven bewaard. Een
+publicatie vult geen hardwaretestvakjes in.
 
 ## Voor een firmwarewijziging
 
