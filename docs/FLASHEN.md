@@ -1,13 +1,13 @@
 # Flashen en instellen zonder PlatformIO of PuTTY
 
 Voor jouw **ESP32-WROOM-32, ESP32-D0WD-V3 rev. 3, 4 MB flash**.
-Firmware **0.2.0-beta.3** is een softwarematig gecontroleerde bèta; de eerste
+Firmware **0.2.0-beta.4** is een softwarematig gecontroleerde bèta; een
 test met jouw echte Battery Sense-units blijft nodig. Voor C3/S3/S2 is dit
 bestand ongeschikt.
 
 ## 1. Eerste flash met ESP32 Flash Download Tool
 
-[Download direct de volledige .bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-factory.bin),
+[Download direct de volledige .bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-factory.bin),
 of pak de ZIP uit `firmware/releases/` uit. Gebruik voor USB het bestand
 **ctek-esp32-wroom-32-factory.bin**. PlatformIO is niet nodig om te flashen.
 
@@ -115,8 +115,8 @@ onbeschikbaar worden. Breng hem terug en controleer herstel zonder herstart.
 
 ## 5. Volgende firmware via wifi
 
-Voor een update vanaf beta.1 of beta.2:
-[download de OTA-bin van beta.3](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-ota.bin).
+Voor een update vanaf beta.1, beta.2 of beta.3:
+[download de OTA-bin van beta.4](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-ota.bin).
 
 1. Open de gatewaypagina en kies **Uitlezen pauzeren en firmware bijwerken**.
    Wacht de actieve poging af en vernieuw de updatepagina.
@@ -127,13 +127,17 @@ Voor een update vanaf beta.1 of beta.2:
 4. Bij afgebroken/mislukte upload blijft de huidige firmware geselecteerd.
    Bij **Annuleren** of na vijf minuten inactiviteit hervat het uitlezen.
 
-Controleer na deze update dat de pagina **0.2.0-beta.3** meldt. Klik bij een
+Controleer na deze update dat de pagina **0.2.0-beta.4** meldt. Klik bij een
 sensor **Nu uitlezen** en bekijk de **BLE-log**. Daar staat nu `GATT-discovery`
 met het aantal gevonden punten, gevolgd door de UUID's en hun mogelijkheden.
 Een punt dat ontbreekt, een punt met `read=0` en een echte readfout krijgen
 verschillende meldingen. `unlock write: OK` betekent dat het bericht is
 verstuurd; de code is dan nog niet bevestigd. Bij een verbindingsfout is de
-code helemaal niet verstuurd. Als uitlezen nog mislukt, download de nieuwe
+code helemaal niet verstuurd. Beta.4 voegt `BLE-disconnect` toe met de reden,
+uitleesstap en timing van een verbreking vóór het eigen opruimen. Deze reden
+bewijst op zichzelf niet dat de code onjuist is. Bij **Bezig met BLE-uitlezing**
+staat er nog de log van de vorige afgeronde poging: wacht tot de poging klaar
+is en vernieuw de pagina. Als uitlezen nog mislukt, download dan de nieuwe
 diagnostics en deel die zonder adressen of andere privégegevens.
 
 Een foutenloze upload bewijst niet dat een nieuwe programmalogica goed werkt.

@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.3/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.4/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -47,6 +47,7 @@ de normale checksum en SHA. De OTA-headercontrole kan zo een andere app weigeren
 - `ctek_session`: uitleesvolgorde via een vervangbaar transport; hosttests gebruiken
   een script voor de BLE-antwoorden en testen dezelfde productiecode.
 - `ble_worker`: NimBLE-adapter in een afzonderlijke FreeRTOS-taak.
+- `ble_diagnostics`: bewaart de eerste verbreekreden, uitleesstap en timing.
 - `main`: eerlijk over vier plekken verdelen, rapporten verwerken en fout-backoff.
 - `config_network`: NVS-configuratie, setup-AP, wifiherstel, mDNS, tijd.
 - `mqtt_gateway`: Discovery, availability, state, historie en gatewaydiagnostics.
@@ -74,6 +75,22 @@ toont alleen een niet-nul verbindingsstatus, als verbindingsstatus. Een
 ontgrendelwrite geldt nooit als bewijs van een juiste code. De softwaretests
 dekken de foutdetails, herstel na een tijdelijke fout en de optionele
 temperatuur-read; radio- en GATT-gedrag van deze update vereisen een sensortest.
+
+Vanaf beta.4 bewaart `onDisconnect` de eerste reden, fase en verstreken
+milliseconden. De worker voegt die vóór het eigen opruimen toe als
+`BLE-disconnect`. Tijd sinds `unlockstart` begint vóór de write met response;
+die tijd omvat dus ook de write zelf. De bestaande sessievolgorde en wachttijden
+blijven gelijk. De log vermeldt ook de wachttijden en verbindingsstatus daarbij.
+Reden en fase zijn waarnemingen, geen bewijs dat een code onjuist is.
+
+Iedere client bezit zijn eigen callback en diagnosegegevens; NimBLE verwijdert
+die pas wanneer de client werkelijk wordt verwijderd. Een callback gebruikt
+geen rapportpointer en kan daardoor niet in de volgende sensorlog schrijven.
+Worker en callback beschermen de kleine diagnosegegevens met een kritieke
+sectie; tekstvorming gebeurt uitsluitend in de worker. Vóór `deleteClient`
+wordt het eigen opruimen gemarkeerd, zodat de normale disconnect niet als
+sensorfout wordt vastgelegd. Hosttests controleren de eerste reden, behoud na
+retry, timing bij `millis()`-overloop en het negeren van opruimcallbacks.
 
 ## MQTT-contract
 

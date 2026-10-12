@@ -1,19 +1,61 @@
 #include "gateway_types.h"
+#include "ble_diagnostics.h"
 
 #include <MD5Builder.h>
 #include <NimBLEDevice.h>
 #include <cstdarg>
 #include <cstring>
 #include <ctime>
+#include <new>
 
 namespace {
 QueueHandle_t jobs = nullptr, reports = nullptr;
 portMUX_TYPE notificationMux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE diagnosticsMux = portMUX_INITIALIZER_UNLOCKED;
 struct NotificationBuffer {
   ctek::Sample samples[ctek::kMaxHistory]{};
   uint16_t expected = 0, count = 0, handle = BLE_HS_CONN_HANDLE_NONE;
   bool active = false, invalid = false;
 } received;
+
+class ClientDiagnostics : public NimBLEClientCallbacks {
+ public:
+  explicit ClientDiagnostics(uint32_t now) : diagnostics_(now) {}
+  void phase(const char* label) {
+    portENTER_CRITICAL(&diagnosticsMux);
+    diagnostics_.setPhase(label);
+    portEXIT_CRITICAL(&diagnosticsMux);
+  }
+  void startUnlock(uint32_t now) {
+    portENTER_CRITICAL(&diagnosticsMux);
+    diagnostics_.startUnlock(now);
+    portEXIT_CRITICAL(&diagnosticsMux);
+  }
+  void onDisconnect(NimBLEClient*, int reason) override {
+    uint32_t now = millis();
+    // Store only bounded data. Formatting and report access stay in the worker.
+    portENTER_CRITICAL(&diagnosticsMux);
+    diagnostics_.disconnected(reason, now);
+    portEXIT_CRITICAL(&diagnosticsMux);
+  }
+  ctek::DisconnectTrace beforeCleanup() {
+    portENTER_CRITICAL(&diagnosticsMux);
+    auto trace = diagnostics_.beforeCleanup();
+    portEXIT_CRITICAL(&diagnosticsMux);
+    return trace;
+  }
+ private:
+  ctek::BleDiagnostics diagnostics_;
+};
+
+const char* readPhase(const char* uuid) {
+  if (!strcmp(uuid, ctek::kClock)) return "klok lezen";
+  if (!strcmp(uuid, ctek::kPeriod)) return "meetperiode lezen";
+  if (!strcmp(uuid, ctek::kCursor)) return "historiecursor lezen";
+  if (!strcmp(uuid, ctek::kTemperature)) return "temperatuur lezen";
+  if (!strcmp(uuid, ctek::kLiveVoltage)) return "live-spanning lezen";
+  return "Bluetooth-read";
+}
 
 void appendLog(BleReport& report, const char* format, ...) {
   size_t used = strlen(report.log);
@@ -42,8 +84,9 @@ void notifications(NimBLERemoteCharacteristic* characteristic, uint8_t* data, si
 
 class NimbleTransport : public ctek::Transport {
  public:
-  NimbleTransport(NimBLEClient* client, NimBLERemoteService* service, BleReport& report)
-      : client_(client), service_(service), report_(report) {}
+  NimbleTransport(NimBLEClient* client, NimBLERemoteService* service, BleReport& report,
+                  ClientDiagnostics& diagnostics)
+      : client_(client), service_(service), report_(report), diagnostics_(diagnostics) {}
 
   bool unlock(const std::array<uint8_t, 32>& input) override {
     auto* characteristic = service_->getCharacteristic(ctek::kUnlock);
@@ -56,7 +99,10 @@ class NimbleTransport : public ctek::Transport {
     md5.add(const_cast<uint8_t*>(input.data()), input.size());
     md5.calculate();
     uint8_t digest[16]; md5.getBytes(digest);
+    diagnostics_.startUnlock(millis());
     bool ok = characteristic->writeValue(digest, sizeof(digest), true);
+    diagnostics_.phase("wachten na ontgrendelwrite");
+    unlockWaitPending_ = ok;
     memset(digest, 0, sizeof(digest));
     appendLog(report_, "unlock write: %s (code en hash worden niet gelogd)\n", ok ? "OK" : "mislukt");
     if (ok) appendLog(report_, "Ontgrendelbericht verstuurd; code nog niet bevestigd\n");
@@ -66,6 +112,7 @@ class NimbleTransport : public ctek::Transport {
   bool read(const char* uuid, uint8_t* output, size_t capacity, size_t& length) override {
     length = 0;
     readError_ = nullptr;
+    diagnostics_.phase(readPhase(uuid));
     if (!client_->isConnected()) {
       readError_ = "Bluetooth-verbinding verbroken voor uitlezen; zie BLE-log";
       appendLog(report_, "read %s: verbinding verbroken\n", uuid);
@@ -110,6 +157,7 @@ class NimbleTransport : public ctek::Transport {
   const char* readError() const override { return readError_; }
 
   bool subscribe() override {
+    diagnostics_.phase("notificaties inschakelen");
     auto* samples = service_->getCharacteristic(ctek::kSamples);
     bool ok = samples && samples->canNotify() && samples->subscribe(true, notifications, true);
     appendLog(report_, "subscribe + CCCD write: %s\n", ok ? "OK" : "mislukt");
@@ -117,6 +165,7 @@ class NimbleTransport : public ctek::Transport {
   }
 
   bool fetch(const ctek::Range& range, ctek::Sample* output, size_t capacity) override {
+    diagnostics_.phase("historie opvragen");
     auto* characteristic = service_->getCharacteristic(ctek::kRange);
     if (!characteristic || !characteristic->canWrite() || range.count > capacity) return false;
     portENTER_CRITICAL(&notificationMux);
@@ -151,11 +200,18 @@ class NimbleTransport : public ctek::Transport {
     }
     return complete;
   }
-  void wait(uint32_t duration) override { vTaskDelay(pdMS_TO_TICKS(duration)); }
+  void wait(uint32_t duration) override {
+    diagnostics_.phase(unlockWaitPending_ ? "wachten na ontgrendelwrite" : "wachten voor klokretry");
+    unlockWaitPending_ = false;
+    appendLog(report_, "wacht %u ms; connected=%u\n", unsigned(duration), client_->isConnected());
+    vTaskDelay(pdMS_TO_TICKS(duration));
+  }
  private:
   NimBLEClient* client_;
   NimBLERemoteService* service_;
   BleReport& report_;
+  ClientDiagnostics& diagnostics_;
+  bool unlockWaitPending_ = false;
   const char* readError_ = nullptr;
 };
 
@@ -181,6 +237,14 @@ void readSensor(const BleJob& job, BleReport& report) {
   appendLog(report, "Firmware %s; adres=%s type=%u\n", kFirmwareVersion, job.address, job.addressType);
   auto* client = NimBLEDevice::createClient();
   if (!client) { report.result.error = "BLE-client aanmaken mislukt"; return; }
+  auto* diagnostics = new (std::nothrow) ClientDiagnostics(millis());
+  if (!diagnostics) {
+    report.result.error = "BLE-diagnose aanmaken mislukt";
+    NimBLEDevice::deleteClient(client);
+    return;
+  }
+  // Client-owned: asynchronous disconnect cleanup may outlive this report/job.
+  client->setClientCallbacks(diagnostics, true);
   client->setConnectTimeout(7000);
   // 30-60 ms, no slave latency; one connection and MTU 23 like the original app.
   client->setConnectionParams(24, 48, 0, 400);
@@ -189,8 +253,10 @@ void readSensor(const BleJob& job, BleReport& report) {
   appendLog(report, "connect=%u status=%d (%s)\n", connected, report.error,
             NimBLEUtils::returnCodeToString(report.error));
   if (connected) {
+    diagnostics->phase("verbinding stabiliseren");
     vTaskDelay(pdMS_TO_TICKS(800));  // Android also lets the connection settle before GATT discovery.
     report.rssi = client->getRssi();
+    diagnostics->phase("CTEK-service zoeken");
     auto* service = client->getService(ctek::kService);
     if (!service) {
       report.result.error = "Verbonden, maar CTEK-service ontbreekt";
@@ -198,6 +264,7 @@ void readSensor(const BleJob& job, BleReport& report) {
     } else {
       // NimBLE 2.x defaults to cache-only access. Explicitly discover all points
       // before using UUID lookups, and include the sensor's read/write properties.
+      diagnostics->phase("GATT-discovery");
       const auto& characteristics = service->getCharacteristics(true);
       appendLog(report, "GATT-discovery: %u punten; connected=%u\n",
                 unsigned(characteristics.size()), client->isConnected());
@@ -209,7 +276,7 @@ void readSensor(const BleJob& job, BleReport& report) {
       if (characteristics.empty()) {
         report.result.error = "CTEK-leespunten niet gevonden; code niet verstuurd; zie BLE-log";
       } else {
-        NimbleTransport transport(client, service, report);
+        NimbleTransport transport(client, service, report, *diagnostics);
         report.result = ctek::runSession(transport, job.code, job.previousValid ? &job.previous : nullptr);
       }
     }
@@ -219,6 +286,16 @@ void readSensor(const BleJob& job, BleReport& report) {
   portENTER_CRITICAL(&notificationMux);
   received.active = false;
   portEXIT_CRITICAL(&notificationMux);
+  auto trace = diagnostics->beforeCleanup();
+  if (trace.seen) {
+    appendLog(report, "BLE-disconnect: reden=%d (0x%X, %s); t=%u ms; fase=%s",
+              trace.reason, unsigned(trace.reason), NimBLEUtils::returnCodeToString(trace.reason),
+              unsigned(trace.sessionMs), trace.phase);
+    if (trace.unlockStarted) appendLog(report, "; sinds unlockstart=%u ms", unsigned(trace.sinceUnlockMs));
+    appendLog(report, "\n");
+  } else {
+    appendLog(report, "BLE-disconnect: niet waargenomen voor opruimen; connected=%u\n", client->isConnected());
+  }
   // deleteClient owns asynchronous disconnect cleanup; do not disconnect twice.
   bool deleted = NimBLEDevice::deleteClient(client);
   appendLog(report, "%s; client opgeruimd=%u\n", report.result.error, deleted);

@@ -1,23 +1,24 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.3**.
+Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.4**.
 
-[Download de wifi-update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-ota.bin),
-[de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-factory.bin)
-of [het flashpakket (ZIP, circa 1,5 MB)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-0.2.0-beta.3.zip)
+[Download de wifi-update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-ota.bin),
+[de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-factory.bin)
+of [het flashpakket (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.4.zip)
 en volg de [installatiehandleiding](docs/FLASHEN.md).
-De [bètarelease 0.2.0-beta.3](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
-bevat ook de losse flashbestanden, controlesommen en bouwgegevens.
+De nieuwe bestanden staan in de repository, met controlesommen en bouwgegevens.
+De [eerdere bètarelease 0.2.0-beta.3](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
+blijft beschikbaar.
 
-Beta.3 zoekt de Bluetooth-leespunten daadwerkelijk op voordat de uitlezing
-begint. De BLE-log toont hun lees-/schrijfmogelijkheden en maakt onderscheid
-tussen een ontbrekend leespunt, ontbrekende leestoegang en een mislukte read.
-Een verstuurd ontgrendelbericht bevestigt de code nog niet. Bij een mislukte
-Bluetooth-verbinding meldt de gateway dat de code niet is verstuurd; een
-verbindingsstatus wordt niet meer als readstatus gepresenteerd. De eerste
-sensortest met beta.3 vindt alle negen Bluetooth-punten bij de sensor in plek 2;
-de verbinding is na de ontgrendelwrite verbroken voordat de klok wordt gelezen.
-Er is nog geen geslaagde meting. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.3.md)
+Beta.4 voegt aan de BLE-log de reden van een verbroken verbinding, de
+uitleesstap en de tijd sinds de poging en ontgrendelwrite toe. Zo kan de
+volgende sensortest de uitval na het ontgrendelbericht beter verklaren.
+Normaal opruimen door de gateway wordt apart gehouden. Deze update verandert
+het ontgrendelprotocol en de wachttijden niet en garandeert geen oplossing.
+De fysieke test met beta.3 vindt alle negen Bluetooth-punten bij plek 2, maar
+de verbinding valt weg vóór de klok-read; ook na een powercycle is nog geen
+geslaagde meting gemeld. Een verstuurd ontgrendelbericht bevestigt de code nog
+niet. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.4.md)
 en [de opgeslagen teststatus en vervolgstappen](docs/VERVOLGTEST.md).
 
 **PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de
