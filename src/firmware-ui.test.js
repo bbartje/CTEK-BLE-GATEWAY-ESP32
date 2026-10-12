@@ -4,11 +4,18 @@ import { JSDOM } from 'jsdom';
 // Execute the script served by the ESP32, with no copied implementation.
 const source = readFileSync('firmware/include/web_ui.h', 'utf8');
 const pageStart = source.match(/R"HTML\(([\s\S]*?)\)HTML"/)[1];
+const fragment = name => source.match(new RegExp(`${name}\\[\\][\\s\\S]*?R"HTML\\(([\\s\\S]*?)\\)HTML"`))[1];
+const actions = fragment('kGatewayActions').replaceAll('{{csrf}}', 'test-form-token');
+const configurationStart = fragment('kConfigurationStart');
+const configurationEnd = fragment('kConfigurationEnd');
 const pages = [];
 
 async function openPage(configured = [true, false, false, false], options = {}) {
   const slots = configured.map(value => `<article class="sensor-slot" data-configured="${value ? 1 : 0}"></article>`).join('');
   const page = new JSDOM(`${pageStart}
+    ${actions}${configurationStart}
+    <form method="post" action="/save"><label>Wifi<input name="ssid" value="Voorbeeldwifi" required></label><button>Opslaan</button></form>
+    ${configurationEnd}
     <span id="label" data-nl="Opslaan" data-en="Save" data-de="Speichern">Opslaan</span>
     ${slots}<button id="add-sensor" type="button">+</button></body></html>`, {
     url: 'http://192.168.4.1',
@@ -84,4 +91,45 @@ test.each([
 test('vier ingestelde sensoren verbergen de plusknop', async () => {
   const window = await openPage([true, true, true, true]);
   expect(window.document.getElementById('add-sensor').hidden).toBe(true);
+});
+
+test('gateway-instellingen beginnen dicht en openen zonder ingevulde waarden te verliezen', async () => {
+  const window = await openPage();
+  const configuration = window.document.getElementById('gateway-config');
+  const summary = configuration.querySelector('summary');
+  const ssid = configuration.querySelector('[name="ssid"]');
+  expect(configuration.open).toBe(false);
+  summary.click();
+  expect(configuration.open).toBe(true);
+  ssid.value = 'Gewijzigde voorbeeldwifi';
+  summary.click();
+  expect(configuration.open).toBe(false);
+  summary.click();
+  expect(ssid.value).toBe('Gewijzigde voorbeeldwifi');
+  expect(ssid.form.getAttribute('action')).toBe('/save');
+});
+
+test.each(['nl', 'en', 'de'])('actieknoppen blijven buiten gesloten instellingen en vertalen (%s)', async language => {
+  const window = await openPage(undefined, { language });
+  const toolbar = window.document.querySelector('.gateway-actions');
+  expect(toolbar.closest('details')).toBeNull();
+  expect(window.document.getElementById('gateway-config').open).toBe(false);
+  expect(toolbar.querySelector('a[href="/"]')).not.toBeNull();
+  expect(toolbar.querySelector('a[href="/diagnostics"]')).not.toBeNull();
+  for (const action of ['/scan', '/ota-mode']) {
+    const form = toolbar.querySelector(`form[action="${action}"]`);
+    expect(form.method).toBe('post');
+    expect(form.querySelector('[name="csrf"]').value).toBe('test-form-token');
+  }
+  for (const node of window.document.querySelectorAll('.gateway-actions [data-nl], #gateway-config [data-nl]')) {
+    expect(node.textContent).toBe(node.dataset[language]);
+  }
+});
+
+test('de projectlink opent de eigen repository met afgeschermde nieuwe tab', async () => {
+  const window = await openPage();
+  const link = window.document.querySelector('.repository-link');
+  expect(link.href).toBe('https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32');
+  expect(link.target).toBe('_blank');
+  expect(link.rel.split(' ')).toEqual(expect.arrayContaining(['noopener', 'noreferrer']));
 });

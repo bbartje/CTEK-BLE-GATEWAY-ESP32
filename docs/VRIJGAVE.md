@@ -1,6 +1,6 @@
 # Procedure voor bouwen, bewaren en vrijgeven
 
-Eigenaar en beheerder: **bbartje**. Actuele testversie: **0.2.0-beta.9**.
+Eigenaar en beheerder: **bbartje**. Nieuwe testkandidaat: **0.2.0-beta.10**.
 
 ## Wat betekent vrijgegeven?
 
@@ -12,8 +12,10 @@ Eigenaar en beheerder: **bbartje**. Actuele testversie: **0.2.0-beta.9**.
 | Tweede tester uitgenodigd | Tester krijgt dezelfde vaste versie en volgt zelfstandig de startgids op eigen hardware. |
 | Stabiele versie 1.0.0 | Eigen en externe installatie-, meet-, herstel- en updatetests zijn geslaagd en de eigenaar heeft dit besloten. |
 
-Beta.9 wordt als bètarelease gepubliceerd. De eigen praktijktest loopt;
-een publicatie vult geen hardwaretestvakjes in.
+Beta.9 is als bètarelease gepubliceerd; de eigen praktijktest is nog niet
+volledig bevestigd. Beta.10 staat als nieuw interfacepakket in de repository,
+zonder gepubliceerde versietag/release of fysieke acceptatie. Een publicatie
+vult geen hardwaretestvakjes in.
 
 ## Voor een firmwarewijziging
 
@@ -56,7 +58,7 @@ het plaatsen van de versietag.
 ## GitHub-bètarelease publiceren
 
 1. Gebruik de geteste commit als doel van `v<versie>`, bijvoorbeeld
-   `v0.2.0-beta.9`. Laat de tag na publicatie op die commit staan.
+   `v0.2.0-beta.10`. Laat de tag na publicatie op die commit staan.
 2. Gebruik de bijbehorende `docs/RELEASE_<versie>.md` als beschrijving.
    Leg softwarecontroles, open hardwaretests en installatiekeuze vast.
 3. Voeg de gecontroleerde OTA-bin, factory-bin, complete ZIP,

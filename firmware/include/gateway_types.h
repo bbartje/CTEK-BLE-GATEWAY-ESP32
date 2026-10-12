@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "ctek_session.h"
 
-constexpr char kFirmwareVersion[] = "0.2.0-beta.9";
+constexpr char kFirmwareVersion[] = "0.2.0-beta.10";
 constexpr uint32_t kStaleSeconds = 1800;
 constexpr size_t kScanLimit = 24;
 

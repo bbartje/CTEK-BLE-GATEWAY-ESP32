@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.9/`; de ZIP staat één niveau
+De nieuwste testkandidaat staat in `releases/0.2.0-beta.10/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -31,8 +31,9 @@ Het pakket bevat ook de startgids voor testers, acceptatiechecklist, een leeg
 testverslag en de releasenotities van de gebouwde versie. De pakketcontrole
 vergelijkt deze documenten met de bronnen. Zie de
 [vrijgaveprocedure](../docs/VRIJGAVE.md) voor de vaste GitHub-tag en publicatie
-als bètarelease. Voor deze documentatie-update blijven de beta.9-factory- en
-OTA-bin byte voor byte gelijk aan de eerder gedeelde bestanden.
+als bètarelease. Beta.10 heeft nieuwe binaries voor de interfacewijziging;
+beta.9 en zijn gepubliceerde release blijven bewaard. Beta.10 is nog geen
+gepubliceerde GitHub-release en heeft nog geen fysieke acceptatie.
 
 De dependencies in `platformio.ini` staan vast: espressif32 7.1.3,
 Arduino ESP32-package 4.20017.260907+sha.dcc1105b (core 2.0.17),
@@ -216,6 +217,19 @@ tellers, `Nu uitlezen`, BLE-log, wijzigen en verwijderen staan onder
 `Details en instellingen`, standaard ingeklapt. Ontbrekende live-spanning wordt
 op de kaart als niet beschikbaar getoond; een verouderde waarde blijft als
 verouderd herkenbaar. De meettijd volgt de gekozen lokale tijdzone.
+
+Vanaf beta.10 staat ook het configuratieformulier onder **Gateway-instellingen**,
+standaard dicht. De opslagknop blijft binnen dat formulier. Een compacte balk
+met vernieuwen, Bluetooth zoeken, diagnostics en firmware bijwerken blijft
+bij scrollen bovenaan bereikbaar. Op kleine schermen lopen de knoppen door
+naar een volgende rij. De pagina gebruikt een retrostijl met crème, petrolgroen
+en warm oranje, en linkt bovenaan naar de eigen GitHub-repository. Taalkeuze en
+sensorbediening gebruiken dezelfde browsercode en worden met de echte
+HTML-fragmenten getest.
+
+De [ESPHome-vergelijking](../docs/VERGELIJKING_ESPHOME_CTEK.md) beschrijft ideeën
+voor historie-import en de verschillen in Bluetooth-versleuteling en langdurige
+verbindingen. Beta.10 verandert de uitleesvolgorde of historiegrenzen niet.
 
 Na iedere herstart met opgeslagen thuiswifi verschijnt twee minuten een herstel-AP met het
 publieke startwachtwoord `CTEK-Start123`; normale wifi-, BLE- en MQTT-start

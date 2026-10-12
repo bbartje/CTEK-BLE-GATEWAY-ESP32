@@ -1,6 +1,6 @@
 # Start hier: CTEK-gateway testen
 
-Versie **0.2.0-beta.9** · Eigenaar en aanspreekpunt: **bbartje**.
+Testkandidaat **0.2.0-beta.10** · Eigenaar en aanspreekpunt: **bbartje**.
 
 Dit is een beperkte bètatest met een eigen ESP32, CTEK-sensor en thuisnetwerk.
 De softwarecontroles zijn geslaagd. De volledige praktijktest van de eigenaar
@@ -17,6 +17,9 @@ berichtenverbinding tussen de gateway en Home Assistant.
 Op de gateway zie je per sensor naam, spanning, Bluetooth-ontvangst en de
 laatste meettijd. Temperatuur, instellingen, logboeken en `Nu uitlezen` staan
 onder `Details en instellingen`. Een lege sensorplek open je met `+`.
+Wifi/MQTT en andere gatewayinstellingen open je via `Gateway-instellingen`.
+De actieknoppen blijven bij scrollen bovenaan bereikbaar. Beta.10 heeft een
+retrostijl en een link naar onze repository.
 
 ## Wat heb je nodig?
 
@@ -36,25 +39,28 @@ herstelprocedure staat in [FLASHEN.md](FLASHEN.md).
 
 ## Kies de juiste download
 
-De [GitHub-bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.9)
-bevat de losse bestanden en het complete ZIP-pakket met deze instructies,
-de controles en een leeg testverslag.
+Het [beta.10-pakket in de repository](../firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.10.zip)
+bevat de binaries, deze instructies, de controles en een leeg testverslag.
+Gebruik op GitHub de knop voor downloaden van het ruwe bestand. Beta.10
+is nog niet als GitHub-release gepubliceerd. De vaste beta.9-release blijft
+beschikbaar voor de eerder begonnen test.
 
 | Jouw situatie | Bestand | Installatie |
 |---|---|---|
 | Nieuw bord of schone installatie | `ctek-esp32-wroom-32-factory.bin` | USB, flashadres **0x0**; wist bestaande instellingen. |
-| Gateway met beta.1–beta.8 bijwerken | `ctek-esp32-wroom-32-ota.bin` | Upload via de updatepagina van de gateway; behoudt instellingen en wachtwoord. |
-| Alles samen downloaden | `ctek-esp32-wroom-32-0.2.0-beta.9.zip` | Pak uit en kies daarna het juiste bestand hierboven. |
+| Gateway met beta.1–beta.9 bijwerken | `ctek-esp32-wroom-32-ota.bin` | Upload via de updatepagina van de gateway; behoudt instellingen en wachtwoord. |
+| Alles samen downloaden | `ctek-esp32-wroom-32-0.2.0-beta.10.zip` | Pak uit en kies daarna het juiste bestand hierboven. |
 
 De losse binaries hebben bij iedere versie dezelfde bestandsnaam. Download
-ze daarom uit de **beta.9-release** en controleer na installatie dat de
-beheerpagina **0.2.0-beta.9** toont.
+ze daarom uit het **beta.10-pakket** en controleer na installatie dat de
+beheerpagina **0.2.0-beta.10** toont.
 
 ## Begin met één sensor
 
 1. Volg [FLASHEN.md](FLASHEN.md) voor USB-installatie of OTA. PlatformIO en
    PuTTY zijn hiervoor niet nodig. Kies bij een nieuwe installatie eerst
-   een eigen beheerwachtwoord en stel daarna wifi en MQTT in.
+   een eigen beheerwachtwoord en open daarna `Gateway-instellingen` om wifi
+   en MQTT in te stellen.
 2. Zet de ESP32 dichtbij één sensor. Sluit de CTEK-app en zet
    telefoon-Bluetooth uit tijdens de gatewaytest.
 3. Zoek Bluetooth-apparaten op de gateway en gebruik het adres en adrestype

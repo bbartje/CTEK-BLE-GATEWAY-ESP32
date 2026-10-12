@@ -172,12 +172,16 @@ bool slotArgument(size_t& slot) {
 void root() {
   if (!authorized()) return;
   String page = startPage();
-  page += "<p>" + localized("Firmware ", "Firmware ", "Firmware ") + String(kFirmwareVersion) + localized(" | wifi: ", " | Wi-Fi: ", " | WLAN: ");
+  page += "<div class='gateway-status'><p>" + localized("Firmware ", "Firmware ", "Firmware ") + String(kFirmwareVersion) + localized(" | wifi: ", " | Wi-Fi: ", " | WLAN: ");
   page += WiFi.status() == WL_CONNECTED ? WiFi.localIP().toString() : localized("setupmodus / niet verbonden", "setup mode / disconnected", "Setup-Modus / nicht verbunden");
   page += localized(" | MQTT: ", " | MQTT: ", " | MQTT: ") + (mqttConnected() ? localized("verbonden", "connected", "verbunden") : localized("niet verbonden", "disconnected", "nicht verbunden")) +
           " (" + localized("status", "status", "Status") + " " + String(mqttStatus()) + ")</p><p>" + localized("Vrij geheugen: ", "Free memory: ", "Freier Speicher: ") + String(ESP.getFreeHeap()) +
           localized(" bytes; minimum: ", " bytes; minimum: ", " Bytes; Minimum: ") + String(ESP.getMinFreeHeap()) + localized(" bytes. Tijd: ", " bytes. Time: ", " Bytes. Zeit: ") +
-          (validEpoch() ? localized("gesynchroniseerd", "synchronized", "synchronisiert") : localized("nog niet gesynchroniseerd", "not synchronized", "nicht synchronisiert")) + "</p>";
+          (validEpoch() ? localized("gesynchroniseerd", "synchronized", "synchronisiert") : localized("nog niet gesynchroniseerd", "not synchronized", "nicht synchronisiert")) + "</p></div>";
+  String actions = FPSTR(ctek::kGatewayActions);
+  actions.replace("{{csrf}}", csrf);
+  page += actions;
+  page += FPSTR(ctek::kConfigurationStart);
   page += "<form method='post' action='/save'>" + token() + "<fieldset><legend>" + localized("Wifi en MQTT", "Wi-Fi and MQTT", "WLAN und MQTT") + "</legend>";
   page += input("ssid", "Wifi-netwerk (2,4 GHz)", "Wi-Fi network (2.4 GHz)", "WLAN-Netzwerk (2,4 GHz)", config.ssid, "required maxlength='32'");
   page += input("wifi_password", "Wifi-wachtwoord; leeg = behouden", "Wi-Fi password; leave blank to keep", "WLAN-Passwort; leer lassen zum Beibehalten", "", "type='password' maxlength='63' autocomplete='new-password'");
@@ -196,9 +200,9 @@ void root() {
   page += input("low_voltage", "Waarschuw onder deze spanning (volt)", "Low-voltage warning threshold (volts)", "Schwellwert für Unterspannung (Volt)", String(config.lowVoltage, 2), "type='number' min='8' max='16' step='0.01' required");
   page += input("admin_password", "Nieuw beheer-/setupwachtwoord; leeg = behouden (12–63 tekens)", "New admin/setup password; leave blank to keep (12–63 characters)", "Neues Admin-/Setup-Passwort; leer lassen zum Beibehalten (12–63 Zeichen)", "", "type='password' minlength='12' maxlength='63' autocomplete='new-password'");
   page += "</fieldset><button>" + localized("Instellingen opslaan en herstarten", "Save settings and restart", "Einstellungen speichern und neu starten") + "</button></form>";
+  page += FPSTR(ctek::kConfigurationEnd);
   page += "<h2>" + localized("Batterijmonitors", "Battery monitors", "Batteriemonitore") + "</h2><p>" + localized("Verbindingen gaan om de beurt. Oude metingen vervallen na 30 minuten.", "Sensors are read one at a time. Readings expire after 30 minutes.", "Die Sensoren werden nacheinander ausgelesen. Messwerte verfallen nach 30 Minuten.") + "</p>";
   page += "<small>" + localized("Bluetooth-ontvangst: −60 dBm is sterker dan −90 dBm. De waarde hoort bij de laatste geslaagde meting.", "Bluetooth signal: −60 dBm is stronger than −90 dBm. The value is from the last successful reading.", "Bluetooth-Empfang: −60 dBm ist stärker als −90 dBm. Der Wert stammt aus der letzten erfolgreichen Messung.") + "</small>";
-  page += "<form method='post' action='/scan'>" + token() + "<button>" + localized("Zoek Bluetooth-apparaten (6 seconden)", "Scan for Bluetooth devices (6 seconds)", "Nach Bluetooth-Geräten suchen (6 Sekunden)") + "</button></form>";
   if (scanRequested || (workInFlight && !scanFinished)) page += "<p>" + localized("Zoeken of uitlezen bezig. Vernieuw deze pagina na enkele seconden.", "Scan or read in progress. Refresh this page in a few seconds.", "Suche oder Abfrage läuft. Aktualisieren Sie diese Seite in einigen Sekunden.") + "</p>";
   if (scanFinished) {
     page += "<details open><summary>" + localized("Scanresultaten", "Scan results", "Suchergebnisse") + "</summary><ul>";
@@ -254,9 +258,7 @@ void root() {
     page += "</article>";
   }
   page += "<button id='add-sensor' type='button' aria-label='Add sensor'>+</button>";
-  page += "<h2>" + localized("Onderhoud via wifi", "Maintenance over Wi-Fi", "Wartung über WLAN") + "</h2><a class='button' href='/diagnostics'>" + localized("Diagnostics downloaden", "Download diagnostics", "Diagnose herunterladen") + "</a> ";
-  page += "<form method='post' action='/ota-mode'>" + token() + "<button>" + localized("Uitlezen pauzeren en firmware bijwerken", "Pause polling and update firmware", "Abfragen pausieren und Firmware aktualisieren") + "</button></form>";
-  page += "<small>" + localized("Gegevens blijven op het bord en gaan naar je eigen MQTT-broker. Gebruik deze HTTP-/MQTT-verbindingen op je eigen vertrouwde netwerk. De CTEK-app kan een sensor bezet houden.", "Data stays on the board and is sent to your own MQTT broker. Use these HTTP/MQTT connections on a trusted network. The CTEK app may keep a sensor busy.", "Daten bleiben auf dem Gerät und werden an Ihren MQTT-Broker gesendet. Verwenden Sie HTTP/MQTT nur in einem vertrauenswürdigen Netzwerk. Die CTEK-App kann einen Sensor belegen.") + "</small></body></html>";
+  page += "<small class='page-note'>" + localized("Gegevens blijven op het bord en gaan naar je eigen MQTT-broker. Gebruik deze HTTP-/MQTT-verbindingen op je eigen vertrouwde netwerk. De CTEK-app kan een sensor bezet houden.", "Data stays on the board and is sent to your own MQTT broker. Use these HTTP/MQTT connections on a trusted network. The CTEK app may keep a sensor busy.", "Daten bleiben auf dem Gerät und werden an Ihren MQTT-Broker gesendet. Verwenden Sie HTTP/MQTT nur in einem vertrauenswürdigen Netzwerk. Die CTEK-App kann einen Sensor belegen.") + "</small></body></html>";
   web.sendHeader("Cache-Control", "no-store");
   web.send(200, "text/html; charset=utf-8", page);
 }

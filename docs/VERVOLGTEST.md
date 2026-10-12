@@ -4,6 +4,16 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
 ## Huidige stand voor eigenaar en meelezers
 
+Nieuwe kandidaat: **beta.10**, met ingeklapte gatewayinstellingen, vaste
+actiebalk, retrostijl en repositorylink. Zie [de releasenotities](RELEASE_0.2.0-beta.10.md)
+en het pakket in `firmware/releases/0.2.0-beta.10/`. Beta.10 heeft nog geen
+gepubliceerde GitHub-release of fysieke acceptatie. De onderstaande beta.9-
+stand blijft de overdracht voor de eerder begonnen hardwaretest. De nieuwe
+[ESPHome-vergelijking](VERGELIJKING_ESPHOME_CTEK.md) is brononderzoek; grotere
+historie-import is nog een vervolgvoorstel.
+
+## Bewaarde stand van beta.9
+
 De eigenaar heeft gevraagd de Bluetooth-ontvangststerkte te herstellen in
 Home Assistant en direct zichtbaar te maken. Beta.9 herstelt de RSSI-sensor en
 zet de ontvangst in dBm naast spanning en meettijd op de compacte kaarten.
