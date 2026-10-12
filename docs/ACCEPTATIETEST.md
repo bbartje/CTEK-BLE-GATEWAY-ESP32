@@ -1,6 +1,6 @@
 # Laatste praktijktest en vrijgave
 
-Versie: **0.2.0-beta.6** · Eigenaar/beheerder: **bbartje**.
+Versie: **0.2.0-beta.7** · Eigenaar/beheerder: **bbartje**.
 
 De softwarecontroles vervangen deze test op een echte ESP32 niet. Vul de
 uitslagen zelf in; een leeg vak betekent **niet getest**. Gebruik uitsluitend
@@ -13,7 +13,7 @@ privé en maak een back-up van Home Assistant.
 
 | Klaar | Controle | Geslaagd als |
 |---|---|---|
-| [ ] | Schone USB-installatie volgens [FLASHEN.md](FLASHEN.md) | Factory-image op 0x0 start; setupnetwerk verschijnt; versie is beta.6. |
+| [ ] | Schone USB-installatie volgens [FLASHEN.md](FLASHEN.md) | Factory-image op 0x0 start; setupnetwerk verschijnt; versie is beta.7. |
 | [ ] | Eerste wachtwoord | Alleen wachtwoordkeuze beschikbaar; te kort, startwachtwoord en ongelijke herhaling geweigerd; eigen wachtwoord werkt na herstart. |
 | [ ] | Eigen wifi en MQTT | Verkeerde wifi/MQTT-invoer geeft een duidelijke melding of herstelroute; met correcte instellingen zijn beide verbonden. |
 | [ ] | Eén echte sensor | Eigen code en adrestype werken; live-spanning en actuele temperatuur worden ontvangen; telefoon-Bluetooth uit tijdens gatewaytest. |
@@ -25,11 +25,11 @@ privé en maak een back-up van Home Assistant.
 | [ ] | Wifi en broker onderbroken | Zet router/wifi en MQTT-broker afzonderlijk tijdelijk uit; na herstel komen metingen terug zonder factory-flash. |
 | [ ] | Home Assistant herstart | Entiteiten en verse metingen keren terug; oude metingen worden niet als vers herhaald. |
 | [ ] | Lokale tijd | Amsterdam toont de juiste lokale tijd; kies UTC en controleer het verschil; MQTT-tijden blijven dezelfde UTC-tijd voorstellen. |
-| [ ] | Nederlands, Engels, Duits en plusknop | Taalkeuze blijft na verversen behouden; plus toont lege plekken tot vier; bestaande sensoren blijven zichtbaar. Technische BLE-logs kunnen Nederlands blijven. |
+| [ ] | Nederlands, Engels, Duits en plusknop | Taalkeuze blijft na verversen behouden; alle lege plekken zijn eerst verborgen, ook plek 4 bij drie ingestelde sensoren; iedere klik op plus opent één lege plek; bestaande sensoren blijven zichtbaar; bij vier ingestelde sensoren verdwijnt plus. Technische BLE-logs kunnen Nederlands blijven. |
 | [ ] | Herstel uitsluitend via setup-wifi | Binnen twee minuten werkt het startwachtwoord alleen op 192.168.4.1 via het setupnetwerk; alleen wachtwoordherstel beschikbaar, geen instellingen, diagnostics of OTA. Op het thuisnetwerk wordt dezelfde login geweigerd. |
 | [ ] | Hersteldeadline | Laat de herstelpagina open tot na twee minuten; opslaan met het startwachtwoord werkt dan niet meer; thuiswifi/MQTT werken door. |
 | [ ] | Wachtwoord daadwerkelijk herstellen | Via setup-wifi tijdig een nieuw wachtwoord kiezen; na herstart werkt dit op het thuisnetwerk; wifi/MQTT/sensoren zijn behouden; oud beheerwachtwoord werkt niet meer. |
-| [ ] | OTA vanaf bestaande beta | Uitlezen pauzeren; huidige poging afronden; beta.6 OTA-bin uploaden; versie en eigen wachtwoord/instellingen blijven correct. Factory-bin wordt geweigerd. |
+| [ ] | OTA vanaf bestaande beta | Uitlezen pauzeren; huidige poging afronden; beta.7 OTA-bin uploaden; versie en eigen wachtwoord/instellingen blijven correct. Factory-bin wordt geweigerd. |
 | [ ] | Afgebroken OTA | Upload afbreken of verkeerd bestand kiezen; oude firmware blijft werken; uitlezen hervat na annuleren of vijf minuten inactiviteit. |
 | [ ] | Herstart en duurtest | Voeding normaal uit/aan: instellingen blijven bewaard. Laat daarna minstens 24 uur draaien op de uiteindelijke plek; controleer updates, herstarts en minimumgeheugen. |
 
@@ -50,10 +50,10 @@ Gebruik fictieve sensornamen. Diagnostics en BLE-logs kunnen Bluetooth-adressen
 en meetwaarden bevatten; verwijder die vóór delen. Deel nooit sensorcodes,
 wachtwoorden of oude seriële opstartlogs zonder controle.
 
-## Van beta.6 naar 1.0.0
+## Van beta.7 naar 1.0.0
 
 1. **Eigen test:** los mislukte controles eerst op. Wijzigt de firmware na deze
-   vastgelegde beta.6-build, maak dan een volgende bètaversie met een nieuw
+   vastgelegde beta.7-build, maak dan een volgende bètaversie met een nieuw
    flashpakket en test de geraakte functies opnieuw.
 2. **Externe bèta:** laat een beperkte groep zelfstandig de handleiding volgen
    op hun eigen ESP32, netwerk, broker en CTEK-sensoren. Verzamel versienummers,
@@ -63,5 +63,5 @@ wachtwoorden of oude seriële opstartlogs zonder controle.
    1.0.0-binaries opnieuw met het nieuwe versienummer; hernoem geen beta-bin.
    Leg resterende beperkingen en de geteste hardware vast in de releasenotities.
 
-Een Git-push met beta.6-code en bestanden bewaart de testkandidaat. Het is geen
+Een Git-push met beta.7-code en bestanden bewaart de testkandidaat. Het is geen
 verklaring dat de fysieke acceptatietest of stabiele vrijgave al is geslaagd.

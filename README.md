@@ -1,15 +1,20 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Owner and maintainer: **bbartje**. Firmware version: **0.2.0-beta.6**.
+Owner and maintainer: **bbartje**. Firmware version: **0.2.0-beta.7**.
 
-[Download the Wi-Fi update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin),
-[the complete factory image (.bin, flash address 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-factory.bin),
-or [the firmware package (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.6.zip),
+[Download the Wi-Fi update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-ota.bin),
+[the complete factory image (.bin, flash address 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-factory.bin),
+or [the firmware package (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.7.zip),
 then follow the [installation guide](docs/FLASHEN.md). The repository includes
 the release files, checksums, and build information. Earlier beta releases remain
 available in the repository.
 
-Beta.6 publishes **live voltage**, **current temperature**, and the low-voltage
+Beta.7 fixes the empty sensor forms: configured sensors stay visible and every
+unused slot appears only after clicking **+**. In beta.6, the first empty slot
+was shown immediately, so three configured sensors exposed the empty fourth
+slot. Each click now opens one empty slot, up to four sensors.
+
+The gateway publishes **live voltage**, **current temperature**, and the low-voltage
 status to Home Assistant. Historical measurements remain available on the
 gateway's history topic, but are no longer separate Home Assistant sensor
 entities. The device is identified as **BartjeB**. The web interface supports
@@ -22,14 +27,14 @@ uploads. Anyone nearby during the window can still reset the password; use
 recovery in a private setting. Normal network access always requires your own
 admin password.
 
-**Current status (October 12, 2026):** the beta.6 source, factory image, OTA image,
-and ZIP are saved in this repository. The OTA download is available for the
-owner's final hardware test. The owner is preparing to install and test beta.6;
-installation and results have not yet been confirmed. The latest confirmed
-version on the owner's ESP32 is beta.4.
+**Current status (October 12, 2026):** the owner reported the empty fourth-slot
+issue during the beta.6 OTA test. Browser tests reproduced it, and beta.7 fixes
+it. The beta.7 source, factory image, OTA image, and ZIP are saved in this
+repository. The OTA download is available for the owner's next hardware test;
+beta.7 installation and complete hardware acceptance are still pending.
 
-For an overview, read the [beta.6 release notes](docs/RELEASE_0.2.0-beta.6.md).
-The [quality report](KWALITEITSRAPPORT-2026-10-12.md) and
+For an overview, read the [beta.7 release notes](docs/RELEASE_0.2.0-beta.7.md).
+The [quality report for beta.6](KWALITEITSRAPPORT-2026-10-12.md) and
 [test status and next steps](docs/VERVOLGTEST.md) are in Dutch and record the
 software checks, known limitations, and outstanding hardware tests. Use the
 [acceptance checklist](docs/ACCEPTATIETEST.md) before inviting external testers.
@@ -42,7 +47,7 @@ slot 3 on beta.4**: connection, unlock, metadata reads, and receipt of two histo
 records all succeeded. The admin page displayed voltage and temperature, and
 this confirmed the saved code for that sensor. Voltage and temperature were
 also reported in Home Assistant. Repeated reads, the other sensor slots, and
-beta.6 behavior still need physical confirmation.
+the complete beta.7 acceptance checklist still need physical confirmation.
 
 **PlatformIO and PuTTY are not required to install this firmware.** For the
 first factory flash, connect to `CTEK-Setup-xxxxxx` with the initial password
@@ -54,11 +59,13 @@ erases the previous settings.
 
 ## Update an Existing Gateway (OTA)
 
-Download the [beta.6 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin).
+Download the [beta.7 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-ota.bin).
 On the gateway page, choose **Pause polling and update firmware**, wait for any
 active sensor read to finish, then upload `ctek-esp32-wroom-32-ota.bin`. Keep
 the ESP32 powered until it restarts. Wi-Fi/MQTT settings, sensor configuration,
-and your admin password are preserved. Do not upload the factory image through
+and your admin password are preserved. After restarting, check the version is
+**0.2.0-beta.7** and empty sensor forms appear only after clicking **+**.
+Do not upload the factory image through
 this page. See [the complete OTA instructions](docs/FLASHEN.md#5-update-firmware-over-wi-fi)
 for update checks, recovery, and troubleshooting.
 

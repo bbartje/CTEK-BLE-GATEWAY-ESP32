@@ -4,37 +4,41 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
 ## Huidige stand voor eigenaar en meelezers
 
-De eigenaar gaat beta.6 via OTA (een firmware-update over wifi) installeren en
-testen en meldt de resultaten daarna. De installatie en de testuitslag zijn
-nog niet bevestigd. Deze notitie bewaart de stand om later verder te gaan.
+De eigenaar heeft tijdens de beta.6-test gemeld dat na OTA (een firmware-update
+over wifi) de lege vierde sensorplek meteen zichtbaar is. Dat gedrag is in de
+code gevonden en met browsertests bevestigd. Beta.7 corrigeert dit: alleen
+ingestelde sensoren zijn meteen zichtbaar, iedere klik op `+` opent één lege
+plek. Installatie en hardwaretest van beta.7 zijn nog niet bevestigd.
 
 | Onderdeel | Vastgelegde stand |
 |---|---|
-| Code en flashpakket beta.6 | Gecommit en op GitHub in commit `4a91612`. |
-| OTA-download | Beschikbaar; op 12 oktober opnieuw gedownload met HTTP 200, 1.208.528 bytes. |
-| Laatst bevestigde versie op de ESP32 | Beta.4; beta.6-installatie nog niet bevestigd. |
+| Code en flashpakket beta.7 | Nieuw pakket in `firmware/releases/0.2.0-beta.7/`; eerdere pakketten blijven beschikbaar. |
+| OTA-download | Beta.7 is de nieuwe download voor de correctie van de plusknop. |
+| Laatste terugmelding van de ESP32 | OTA tijdens de beta.6-test uitgevoerd; lege vierde sensorplek zichtbaar. Versienummer op de pagina niet apart gemeld. |
 | Eerder hardwarebewijs | Eén volledige uitlezing van sensorplek 3 met beta.4 en ontvangst in Home Assistant. |
-| Volgende stap | Eigenaar installeert beta.6 en voert de acceptatietest uit; resultaten volgen. |
+| Volgende stap | Eigenaar installeert beta.7, controleert de plusknop en vervolgt de acceptatietest. |
 
-Begin bij de [OTA-download voor beta.6](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin)
+Begin bij de [OTA-download voor beta.7](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-ota.bin)
 en de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
-Lees voor de wijzigingen de [releasenotities](RELEASE_0.2.0-beta.6.md),
+Lees voor de wijzigingen de [releasenotities](RELEASE_0.2.0-beta.7.md),
 voor de bekende aandachtspunten het
-[kwaliteitsrapport](../KWALITEITSRAPPORT-2026-10-12.md) en voor de controles de
+[kwaliteitsrapport van beta.6](../KWALITEITSRAPPORT-2026-10-12.md) en voor de controles de
 [acceptatietest](ACCEPTATIETEST.md). Lege testvakken betekenen **niet getest**.
-De softwarecontroles zijn geslaagd; de fysieke beta.6-test en externe
+De softwarecontroles zijn geslaagd; de fysieke beta.7-test en externe
 acceptatie staan nog open. Er is nog geen stabiele versie 1.0.0 vrijgegeven.
 
 ## Opgeslagen firmware
 
-Nieuwste versie: **0.2.0-beta.6**, voor ESP32-WROOM-32 met 4 MB flash.
+Nieuwste versie: **0.2.0-beta.7**, voor ESP32-WROOM-32 met 4 MB flash.
 Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 
-- De beta.6-code en het gecontroleerde flashpakket staan op GitHub in commit
-  `4a91612f52d3eb6de8f53ce3ff553b039ffb6b04`.
-- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.6/`; de ZIP
+- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.7/`; de ZIP
   staat één map hoger. De OTA-download is direct beschikbaar vanuit de
-  repository. Zie [de releasenotities](RELEASE_0.2.0-beta.6.md).
+  repository. Zie [de releasenotities](RELEASE_0.2.0-beta.7.md).
+- Het eerdere beta.6-pakket blijft beschikbaar; de bijbehorende code en
+  bestanden zijn bewaard in commit `4a91612f52d3eb6de8f53ce3ff553b039ffb6b04`.
+  De beta.6 OTA-download is op 12 oktober gecontroleerd: HTTP 200,
+  1.208.528 bytes.
 
 ### Eerdere vrijgave: beta.3
 
@@ -50,6 +54,8 @@ Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 
 Beta.6 voegt herstel-wifi voor twee minuten na opstart, Nederlands/Engels/Duits,
 een tijdzonekeuze, progressieve sensorplekken en live Home Assistant-waarden toe.
+Beta.7 verbergt ook de eerste lege sensorplek achter `+`, zodat drie ingestelde
+sensoren geen leeg vierde formulier tonen.
 De softwarelogica is niet hetzelfde als hardwarebewijs: de live BLE-punten,
 herhaald uitlezen, MQTT-ontvangst, herstel-login en OTA moeten op de ESP32 nog
 worden bevestigd.
@@ -59,9 +65,9 @@ via het setupnetwerk; instellingen, diagnostics en OTA vereisen het eigen
 wachtwoord. Ook zijn de tijdzone-overwrite, het verkeerd benoemen van
 historische spanning en de multipart-parserkwetsbaarheid gecorrigeerd.
 Gebruik [de acceptatietest](ACCEPTATIETEST.md) voor de laatste eigen test.
-Beta.6 blijft een testkandidaat; de volgende fase is een beperkte externe bèta,
-en pas daarna kan een stabiele 1.0.0 volgen. Er is nog geen nieuwe fysieke
-uitslag vastgelegd.
+Beta.7 blijft een testkandidaat; de volgende fase is een beperkte externe bèta,
+en pas daarna kan een stabiele 1.0.0 volgen. De volledige fysieke
+acceptatieuitslag is nog niet vastgelegd.
 
 Beta.3 zoekt alle GATT-punten daadwerkelijk op, logt hun mogelijkheden en
 maakt onderscheid tussen ontbrekende punten, ontbrekende leestoegang en
@@ -81,6 +87,13 @@ controleren behoud van foutdetails, herstel na een tijdelijke klokfout en een
 ontbrekende optionele temperatuur-read. Nieuwe diagnosetests controleren behoud
 van de eerste reden en fase na retry, timing over klokoverloop en het negeren
 van opruimevents. De eerdere GitHub-controle van beta.3 is ook geslaagd.
+
+Voor beta.7 controleren de browsertests het echte script van de beheerpagina:
+alle lege plekken verborgen bij openen, één lege plek per klik op `+`,
+bestaande sensoren zichtbaar en de plusknop verborgen wanneer geen verborgen
+lege plekken over zijn. De tests omvatten ook precies drie ingestelde
+sensoren en een browser die lokale opslag blokkeert. De tien JavaScript-tests,
+zeven C++-testsuites, uploadbeveiligingstest en releasecontroles zijn geslaagd.
 
 ## Bewijs uit de fysieke test
 
@@ -153,7 +166,7 @@ persoonlijke logs. De eigen instellingen blijven op de ESP32 opgeslagen.
 De gebruiker wil vanavond verder testen met een andere sensor. Beta.5 is
 gecommit en naar GitHub gepusht in commit `5807d2a`; de publieke OTA-download
 is byte voor byte vergeleken met het geteste lokale bestand en is gelijk.
-De nieuwste expliciet gemelde firmware op de ESP32 is beta.4. Installatie
+De nieuwste expliciet gemelde firmware op de ESP32 was toen beta.4. Installatie
 van beta.5 en de nieuwe standaardweergave zijn nog niet bevestigd.
 
 Gebruik voor de volgende sensor het bijbehorende adres, het adrestype uit de
@@ -162,22 +175,38 @@ Beoordeel één afgeronde poging tegelijk. Noteer de sensorplek, firmwareversie,
 scan-signaalsterkte en het resultaat; deel geen codes of wachtwoorden.
 De werkende configuratie van plek 3 blijft het referentiepunt.
 
-## Eerstvolgende test: beta.6 op hardware controleren
+## Eerste terugmelding na de beta.6 OTA-update
 
-1. Installeer beta.6 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
+Op 12 oktober meldt de eigenaar dat de lege vierde sensorplek na OTA direct
+zichtbaar is, terwijl die achter een plusknop moest staan. Dit is geen bewijs
+dat de OTA verkeerde bronnen heeft gebruikt: de beta.6-browsercode liet bewust
+de eerste lege plek zien, ongeacht het aantal ingestelde sensoren. Bij drie
+ingestelde sensoren werd daardoor ook de plusknop verborgen.
+
+De fout is met de productie-browsercode gereproduceerd en in beta.7 hersteld.
+Er zijn bij deze terugmelding geen nieuwe sensoruitlezingen, Home
+Assistant-resultaten of overige acceptatiecontroles gemeld.
+
+## Eerstvolgende test: beta.7 op hardware controleren
+
+1. Installeer beta.7 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
    Pauzeer het uitlezen, wacht tot de lopende poging klaar is en upload de
-   OTA-bin. Controleer na herstart versie **0.2.0-beta.6** en het behoud van
+   OTA-bin. Controleer na herstart versie **0.2.0-beta.7** en het behoud van
    wifi-, MQTT- en sensorinstellingen en je eigen wachtwoord.
-2. Begin met de eerder werkende sensor van plek 3. Houd telefoon-Bluetooth uit
+2. Controleer bij drie ingestelde sensoren dat plek 4 eerst verborgen is en
+   `+` zichtbaar. Klik op `+`: alleen die lege plek moet verschijnen. Vernieuw
+   zonder die plek op te slaan: de lege plek moet weer verborgen zijn en de
+   drie bestaande sensoren moeten zichtbaar blijven.
+3. Begin met de eerder werkende sensor van plek 3. Houd telefoon-Bluetooth uit
    en wacht op een afgeronde poging met **Meting ontvangen**. Controleer live
    spanning en actuele temperatuur op de gateway en in Home Assistant.
-3. Controleer de lage-spanningsstatus, `BartjeB` bij apparaatinfo en het opruimen
+4. Controleer de lage-spanningsstatus, `BartjeB` bij apparaatinfo en het opruimen
    van de oude dubbele temperatuur- en RSSI-entiteiten. Eigen Home
    Assistant-weergaveprecisie blijft leidend. Controleer ook de lokale tijd.
-4. Laat meerdere automatische uitleesrondes lopen. Controleer dat de geslaagde
+5. Laat meerdere automatische uitleesrondes lopen. Controleer dat de geslaagde
    teller oploopt en Home Assistant verse updates ontvangt. Noteer afstand en
    scan-signaalsterkte voor de werkende opstelling.
-5. Test de overige sensoren één voor één met hun eigen code en adres. Werk de
+6. Test de overige sensoren één voor één met hun eigen code en adres. Werk de
    resterende [acceptatiecontroles](ACCEPTATIETEST.md) af, inclusief herstel,
    verbindingsuitval en de duurtest. Noteer wat je nog niet hebt getest.
 

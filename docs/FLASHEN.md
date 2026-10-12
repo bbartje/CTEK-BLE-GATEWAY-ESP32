@@ -1,13 +1,13 @@
 # Flash and Set Up the Gateway Without PlatformIO or PuTTY
 
 For **ESP32-WROOM-32, ESP32-D0WD-V3 revision 3, with 4 MB flash** only.
-Firmware **0.2.0-beta.6** has passed software checks, but still needs testing
+Firmware **0.2.0-beta.7** has passed software checks, but still needs testing
 with your physical Battery Sense units. This image is not for ESP32-C3/S3/S2.
 
 ## 1. First Flash with the ESP32 Flash Download Tool
 
 Download the official [Espressif Flash Download Tool](https://www.espressif.com/en/support/download/other-tools).
-Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-factory.bin)
+Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-factory.bin)
 or extract the ZIP from `firmware/releases/`. For USB installation, use
 **ctek-esp32-wroom-32-factory.bin**. PlatformIO is not needed to flash it.
 
@@ -108,7 +108,8 @@ and restarts the setup process above.
 1. Fully close the CTEK app to release any existing Bluetooth connection. Start
    with one sensor close to the ESP32.
 2. Click **Search for Bluetooth devices**, wait six seconds, and refresh the
-   page. Copy the address and address type to slot 1. The scan lists candidates;
+   page. Click **+** to open slot 1, then copy the address and address type.
+   The scan lists candidates;
    the actual CTEK service is verified when connecting.
 3. Enter a name and the code from the sensor label: 16 characters, or the 11
    characters without the `40149` prefix. Save. You can correct an invalid code
@@ -124,7 +125,9 @@ and restarts the setup process above.
    decimal places for voltage and one for temperature. A precision setting you
    chose manually in Home Assistant takes precedence.
 6. Save the first sensor, then use the **+** control to reveal another slot.
-   Add sensors 2–4 one at a time. Over at least two polling rounds, confirm that each sensor
+   Saved sensors stay visible; every empty slot starts hidden, including slot 4
+   when three sensors are configured. Each click reveals one empty slot. Add
+   sensors 2–4 one at a time. Over at least two polling rounds, confirm that each sensor
    has more than one successful read. The default interval is five minutes per
    sensor; the ESP32 does not keep four connections open continuously.
 
@@ -148,7 +151,7 @@ within range and confirm that it recovers without restarting the board.
 
 ## 5. Update Firmware over Wi-Fi
 
-For an update from beta.1 through beta.5, [download the beta.6 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin).
+For an update from beta.1 through beta.6, [download the beta.7 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-ota.bin).
 
 1. Open the gateway page and select **Pause polling and update firmware**. Wait
    for the active read to finish, then refresh the update page.
@@ -159,7 +162,9 @@ For an update from beta.1 through beta.5, [download the beta.6 OTA image](https:
 4. If an upload is cancelled or fails, the current firmware remains selected.
    Polling resumes after **Cancel** or five minutes of inactivity.
 
-After the update, confirm the page reports **0.2.0-beta.6**. The gateway
+After the update, confirm the page reports **0.2.0-beta.7**. Empty sensor forms
+should appear only after clicking **+**; existing configured sensors stay visible.
+Refreshing the page hides any empty forms that have not been saved. The gateway
 republishes Discovery: voltage defaults to two decimal places and current
 temperature to one. The `voltage`, `temperature`, and `low_voltage` entity IDs
 remain stable. The old separate `current_temperature` and Bluetooth RSSI
@@ -204,5 +209,5 @@ on `/history` are not automatically backfilled into the graph. See the
 [firmware documentation](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/blob/main/firmware/README.md) for more information.
 
 Before inviting external testers, complete the owner's
-[acceptance checklist](ACCEPTATIETEST.md). Keep beta.6 during external testing;
+[acceptance checklist](ACCEPTATIETEST.md). Keep the beta label during external testing;
 version 1.0.0 follows successful testing on their own hardware and networks.

@@ -32,7 +32,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   const slots = [...document.querySelectorAll('.sensor-slot')];
   const empty = slots.filter(slot => slot.dataset.configured === '0');
-  empty.forEach((slot, index) => { slot.hidden = index > 0; });
+  empty.forEach(slot => { slot.hidden = true; });
   const add = document.getElementById('add-sensor');
   if (add) {
     const refresh = () => { add.hidden = !empty.some(slot => slot.hidden); };

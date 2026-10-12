@@ -211,7 +211,7 @@ void root() {
   }
   for (size_t slot = 0; slot < ctek::kMaxSensors; ++slot) {
     const auto& state = states[slot]; const auto& sensor = sensors[slot];
-    page += "<article class='sensor-slot' data-configured='" + String(state.configured ? "1" : "0") + "'><h3>" + localized("Plek ", "Slot ", "Platz ") + String(slot + 1) + " — " + escape(state.configured ? sensor.name : String("vrij")) + "</h3>";
+    page += "<article class='sensor-slot' data-configured='" + String(state.configured ? "1" : "0") + "'" + (state.configured ? "" : " hidden") + "><h3>" + localized("Plek ", "Slot ", "Platz ") + String(slot + 1) + " — " + escape(state.configured ? sensor.name : String("vrij")) + "</h3>";
     if (state.configured) {
       if (state.status == "Meting ontvangen") page += "<p>" + localized("Meting ontvangen", "Reading received", "Messwert empfangen") + "</p>";
       else if (state.status == "Bezig met BLE-uitlezing") page += "<p>" + localized("Bezig met BLE-uitlezing", "BLE read in progress", "BLE-Abfrage läuft") + "</p>";

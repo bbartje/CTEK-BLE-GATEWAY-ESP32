@@ -51,18 +51,27 @@ test('taal en sensorbediening blijven werken als de browser opslag blokkeert', a
   selector.dispatchEvent(new window.Event('change'));
   expect(window.document.getElementById('label').textContent).toBe('Save');
   const slots = window.document.querySelectorAll('.sensor-slot');
+  expect(slots[1].hidden).toBe(true);
   expect(slots[2].hidden).toBe(true);
   window.document.getElementById('add-sensor').click();
-  expect(slots[2].hidden).toBe(false);
+  expect(slots[1].hidden).toBe(false);
+  expect(slots[2].hidden).toBe(true);
 });
 
-test.each([[false, false, false, false], [true, false, true, false]])(
-  'plus toont de lege sensorplekken één voor één (%j)', async (...configured) => {
+test.each([
+  [false, false, false, false],
+  [true, false, false, false],
+  [true, false, true, false],
+  [true, true, true, false],
+  [false, true, true, true],
+])(
+  'plus toont elke lege plek pas na klikken (%j, %j, %j, %j)', async (...configured) => {
     const window = await openPage(configured);
     const empty = [...window.document.querySelectorAll('[data-configured="0"]')];
     const add = window.document.getElementById('add-sensor');
-    expect(empty.filter(slot => !slot.hidden)).toHaveLength(1);
-    for (let count = 2; count <= empty.length; count++) {
+    expect(empty.filter(slot => !slot.hidden)).toHaveLength(0);
+    expect([...window.document.querySelectorAll('[data-configured="1"]')].every(slot => !slot.hidden)).toBe(true);
+    for (let count = 1; count <= empty.length; count++) {
       expect(add.hidden).toBe(false);
       add.click();
       expect(empty.filter(slot => !slot.hidden)).toHaveLength(count);

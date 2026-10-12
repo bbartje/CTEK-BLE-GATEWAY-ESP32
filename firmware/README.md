@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.6/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.7/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -186,8 +186,11 @@ Default pollinterval 300 s; instelbaar 60–900 s. Bij mislukking retry na
 geprobeerd; geen eindeloze poging voor dezelfde sensor.
 
 De beheerpagina ondersteunt Nederlands, Engels en Duits. De browser bewaart de
-keuze lokaal. Alleen ingestelde sensoren en de eerstvolgende lege plek worden
-getoond; met `+` verschijnt een volgende plek, tot het maximum van vier.
+keuze lokaal. Vanaf beta.7 zijn alleen ingestelde sensoren direct zichtbaar;
+alle lege plekken blijven verborgen totdat je op `+` klikt. Iedere klik opent
+één lege plek, ook vóór het opslaan van de eerste sensor. Bij vier ingestelde
+sensoren verdwijnt de plusknop. Niet opgeslagen plekken zijn na verversen weer
+verborgen.
 BLE-logs blijven achter een uitklapmenu.
 
 Na iedere herstart met opgeslagen thuiswifi verschijnt twee minuten een herstel-AP met het
