@@ -170,6 +170,16 @@ development environment. Testing with your sensors and their actual range is
 still required. This version does not provide CTEK's calculated state of charge
 or a complete three-month history import; see the reverse-engineering report.
 
+## Comparison with the ESPHome Gateway
+
+The [source comparison](docs/VERGELIJKING_ESPHOME_CTEK.md) (Dutch, October 12,
+2026) records what we can learn from
+[dtech77pl/esphome-ctek-battery-sense](https://github.com/dtech77pl/esphome-ctek-battery-sense):
+small history batches, a persistent resume position, and separate historical
+storage in Home Assistant. It also documents differences in encryption,
+connection lifetime, timestamps, and cursor rollover. Full history import is
+a proposed follow-up; the current 12/48-record limits still apply.
+
 ## Data and Privacy
 
 The project handles battery voltage, temperature, sensor addresses, and
