@@ -4,7 +4,7 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
 ## Opgeslagen firmware
 
-- Nieuwe diagnoseversie: **0.2.0-beta.4**, voor ESP32-WROOM-32 met 4 MB flash.
+- Nieuwste versie: **0.2.0-beta.5**, voor ESP32-WROOM-32 met 4 MB flash.
   Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 - De eerdere beta.3-firmware en flashbestanden zijn gecommit en gepusht in
   commit `8db6863f0194155364d02ce2601a1a3342cab8cb`.
@@ -13,8 +13,8 @@ Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 - [De OTA-bin voor een wifi-update](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-ota.bin?download=1)
   is 1.181.392 bytes. Grootte en SHA-256 van de publieke download zijn
   gecontroleerd tegen de lokale binary.
-- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.4/`; de ZIP staat
-  één map hoger. Zie [de releasenotities](RELEASE_0.2.0-beta.4.md).
+- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.5/`; de ZIP staat
+  één map hoger. Zie [de releasenotities](RELEASE_0.2.0-beta.5.md).
 
 Beta.3 zoekt alle GATT-punten daadwerkelijk op, logt hun mogelijkheden en
 maakt onderscheid tussen ontbrekende punten, ontbrekende leestoegang en
@@ -23,6 +23,8 @@ De klokretry blijft begrensd. Codes en wachtwoorden worden niet gelogd.
 Beta.4 voegt de eerste disconnectreden, uitleesstap en timing toe zonder het
 protocol of de wachttijden te wijzigen. Het eigen opruimen van een client
 wordt niet als sensorfout geteld.
+Beta.5 stelt in MQTT Discovery twee decimalen voor spanning en één voor beide
+temperaturen voor. De oorspronkelijke numerieke meetwaarden blijven behouden.
 
 ## Softwarecontrole
 
@@ -38,7 +40,7 @@ van opruimevents. De eerdere GitHub-controle van beta.3 is ook geslaagd.
 De eerdere diagnostics melden beta.3, 4 MB flash, verbonden wifi en MQTT,
 en gesynchroniseerde tijd. De nieuwste test met beta.4 bevestigt voor plek 3
 een volledige sensoruitlezing en metingen op de beheerpagina. Ontvangst van
-sensormetingen in Home Assistant is nog niet bevestigd.
+spanning en temperatuur in Home Assistant is daarna door de gebruiker gemeld.
 
 | Sensorplek | Laatste waarneming | Wat dit aantoont |
 |---|---|---|
@@ -86,6 +88,16 @@ is dus nog niet bevestigd. De afstand en signaalsterkte bij de succesvolle
 test zijn nog niet expliciet gemeld. Bereik is een mogelijke verklaring
 voor de eerdere verbindingsfout, maar de oorzaak is hiermee niet bewezen.
 
+### Home Assistant en gewenste decimalen
+
+De gebruiker meldt daarna dat de spanning in Home Assistant op hele volts
+werd weergegeven en handmatig kon worden ingesteld op meer decimalen.
+Temperatuur verscheen al met één decimaal. Daarmee is ontvangst van spanning
+en temperatuur in Home Assistant gemeld; herhaald bijwerken is nog niet
+afzonderlijk bevestigd. Beta.5 maakt twee decimalen voor spanning en één voor
+temperatuur de voorgestelde standaard. Een eigen instelling in Home Assistant
+blijft voorgaan. De nieuwe Discovery-weergave moet nog fysiek worden getest.
+
 Deze notitie bevat geen echte sensoradressen, codes, wachtwoorden of ruwe
 persoonlijke logs. De eigen instellingen blijven op de ESP32 opgeslagen.
 
@@ -96,9 +108,10 @@ persoonlijke logs. De eigen instellingen blijven op de ESP32 opgeslagen.
 2. Houd telefoon-Bluetooth uit en laat de ESP32 op dezelfde plek voor enkele
    automatische uitlezingen. Controleer of het aantal geslaagde pogingen verder
    oploopt. Noteer afstand en scan-signaalsterkte voor de werkende opstelling.
-3. Controleer of Home Assistant de spanning en temperatuur van deze sensor
-   ontvangt en bij volgende uitlezingen blijft bijwerken. Verbonden MQTT
-   alleen bewijst die ontvangst niet.
+3. Installeer beta.5 via de [wifi-updatehandleiding](FLASHEN.md#5-volgende-firmware-via-wifi).
+   Controleer dat Home Assistant de spanning en temperatuur bij volgende
+   uitlezingen blijft bijwerken, met twee decimalen voor spanning en één voor
+   temperatuur. Een eigen decimaalinstelling in Home Assistant gaat voor.
 4. Identificeer daarna de overige sensoren en sla per sensor de bijbehorende
    code op. Test ze één voor één vanuit een opstelling met voldoende ontvangst.
 

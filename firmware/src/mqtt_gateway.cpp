@@ -44,7 +44,7 @@ void availability(JsonDocument& doc, size_t slot) {
   doc["availability_mode"] = "all";
 }
 bool discovery(size_t slot, const char* field, const char* label,
-               const char* unit, const char* deviceClass, bool diagnostic = false) {
+               const char* unit, const char* deviceClass, uint8_t precision, bool diagnostic = false) {
   JsonDocument doc;
   doc["name"] = label;
   doc["unique_id"] = "ctek_" + gatewayIdentifier + "_" + id(slot) + "_" + field;
@@ -54,6 +54,7 @@ bool discovery(size_t slot, const char* field, const char* label,
   doc["unit_of_measurement"] = unit;
   doc["device_class"] = deviceClass;
   doc["state_class"] = "measurement";
+  doc["suggested_display_precision"] = precision;
   if (diagnostic) doc["entity_category"] = "diagnostic";
   availability(doc, slot); deviceInfo(doc, slot);
   return publishJson(discoveryTopic(slot, "sensor", field), doc, true);
@@ -70,10 +71,10 @@ bool lowDiscovery(size_t slot) {
   return publishJson(discoveryTopic(slot, "binary_sensor", "low_voltage"), doc, true);
 }
 bool publishDiscovery(size_t slot) {
-  bool success = discovery(slot, "voltage", "Spanning", "V", "voltage");
-  success = discovery(slot, "temperature", "Temperatuur bij spanningsmeting", "°C", "temperature") && success;
-  success = discovery(slot, "current_temperature", "Actuele temperatuur", "°C", "temperature") && success;
-  success = discovery(slot, "rssi", "Bluetooth-signaal", "dBm", "signal_strength", true) && success;
+  bool success = discovery(slot, "voltage", "Spanning", "V", "voltage", 2);
+  success = discovery(slot, "temperature", "Temperatuur bij spanningsmeting", "°C", "temperature", 1) && success;
+  success = discovery(slot, "current_temperature", "Actuele temperatuur", "°C", "temperature", 1) && success;
+  success = discovery(slot, "rssi", "Bluetooth-signaal", "dBm", "signal_strength", 0, true) && success;
   return lowDiscovery(slot) && success;
 }
 

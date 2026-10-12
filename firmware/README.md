@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.4/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.5/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -93,6 +93,15 @@ sensorfout wordt vastgelegd. Hosttests controleren de eerste reden, behoud na
 retry, timing bij `millis()`-overloop en het negeren van opruimcallbacks.
 
 ## MQTT-contract
+
+Vanaf beta.5 bevat de sensor-Discovery `suggested_display_precision`: 2 voor
+spanning, 1 voor historische en actuele temperatuur, en 0 voor signaalsterkte.
+Dit bepaalt de standaardweergave in Home Assistant; de numerieke waarden op
+`/state` en `/history` worden niet extra afgerond. Na MQTT-verbinding en een
+Home Assistant birthbericht wordt Discovery opnieuw gepubliceerd, met dezelfde
+sensoridentiteiten. Een handmatige decimaalinstelling in Home Assistant gaat
+voor op dit voorstel. Zie de [MQTT-sensordocumentatie](https://www.home-assistant.io/integrations/sensor.mqtt/)
+en [uitleg over weergaveprecisie](https://developers.home-assistant.io/blog/2023/02/08/sensor_presentation_rounding/).
 
 `<gateway>` = wifi-MAC zonder dubbele punten, kleine letters.
 `<sensor>` = sensor-MAC zonder dubbele punten, kleine letters.

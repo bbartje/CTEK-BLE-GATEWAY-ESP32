@@ -1,24 +1,28 @@
 # CTEK Battery Sense → ESP32 → Home Assistant
 
-Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.4**.
+Eigenaar en beheerder: **bbartje**. Firmwareversie: **0.2.0-beta.5**.
 
-[Download de wifi-update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-ota.bin),
-[de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-factory.bin)
-of [het flashpakket (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.4.zip)
+[Download de wifi-update (.bin)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-ota.bin),
+[de volledige flashfirmware (.bin, adres 0x0)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-factory.bin)
+of [het flashpakket (ZIP)](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/ctek-esp32-wroom-32-0.2.0-beta.5.zip)
 en volg de [installatiehandleiding](docs/FLASHEN.md).
 De nieuwe bestanden staan in de repository, met controlesommen en bouwgegevens.
 De [eerdere bètarelease 0.2.0-beta.3](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
 blijft beschikbaar.
 
-Beta.4 voegt aan de BLE-log de reden van een verbroken verbinding, de
-uitleesstap en de tijd sinds de poging en ontgrendelwrite toe. Normaal opruimen
-door de gateway wordt apart gehouden; het protocol en de wachttijden zijn gelijk.
+Beta.5 stelt via MQTT Discovery de standaardweergave in Home Assistant in:
+**spanning met twee decimalen**, beide temperaturen met één decimaal en
+signaalsterkte als geheel getal. De verstuurde meetwaarden behouden hun
+volledige precisie. Een eigen decimaalinstelling in Home Assistant blijft
+voorgaan. Na de wifi-update worden de sensorinstellingen opnieuw verstuurd.
+De Bluetooth-diagnose uit beta.4 blijft beschikbaar.
 Op 12 oktober 2026 is met beta.4 voor **plek 3 de eerste volledige fysieke
 uitlezing bevestigd**: verbinden, ontgrendelen, metadata lezen en twee
 historierecords ontvangen slagen. De beheerpagina toont spanning en temperatuur.
-Daarmee is de opgeslagen code voor deze sensor bevestigd. Herhaald uitlezen,
-de overige plekken en ontvangst van metingen in Home Assistant moeten nog
-worden bevestigd. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.4.md)
+Daarmee is de opgeslagen code voor deze sensor bevestigd. De gebruiker meldt
+ook spanning en temperatuur in Home Assistant. Herhaald uitlezen, de overige
+plekken en de nieuwe standaardweergave van beta.5 moeten nog worden bevestigd.
+Zie [de releasenotities](docs/RELEASE_0.2.0-beta.5.md)
 en [de opgeslagen teststatus en vervolgstappen](docs/VERVOLGTEST.md).
 
 **PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de

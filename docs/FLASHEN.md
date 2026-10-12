@@ -1,13 +1,13 @@
 # Flashen en instellen zonder PlatformIO of PuTTY
 
 Voor jouw **ESP32-WROOM-32, ESP32-D0WD-V3 rev. 3, 4 MB flash**.
-Firmware **0.2.0-beta.4** is een softwarematig gecontroleerde bèta; een
+Firmware **0.2.0-beta.5** is een softwarematig gecontroleerde bèta; een
 test met jouw echte Battery Sense-units blijft nodig. Voor C3/S3/S2 is dit
 bestand ongeschikt.
 
 ## 1. Eerste flash met ESP32 Flash Download Tool
 
-[Download direct de volledige .bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-factory.bin),
+[Download direct de volledige .bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-factory.bin),
 of pak de ZIP uit `firmware/releases/` uit. Gebruik voor USB het bestand
 **ctek-esp32-wroom-32-factory.bin**. PlatformIO is niet nodig om te flashen.
 
@@ -92,6 +92,8 @@ op **0x0**. Dat wist de oude instellingen en begint met de bovenstaande stappen.
    **Instellingen → Apparaten en diensten → MQTT** verschijnt de sensor met
    spanning, twee temperaturen, signaalsterkte en **Lage spanning**. De twee
    temperaturen horen bij verschillende momenten en mogen verschillen.
+   De standaardweergave is twee decimalen voor spanning en één voor temperatuur.
+   Een eerder handmatig gekozen aantal decimalen in Home Assistant blijft gelden.
 6. Voeg sensoren 2–4 toe. Controleer over minstens twee uitleesrondes dat elke
    sensor meer dan één geslaagde uitlezing krijgt. De standaardronde is eens
    per vijf minuten per sensor, geen vier blijvend open verbindingen.
@@ -115,8 +117,8 @@ onbeschikbaar worden. Breng hem terug en controleer herstel zonder herstart.
 
 ## 5. Volgende firmware via wifi
 
-Voor een update vanaf beta.1, beta.2 of beta.3:
-[download de OTA-bin van beta.4](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-ota.bin).
+Voor een update vanaf beta.1, beta.2, beta.3 of beta.4:
+[download de OTA-bin van beta.5](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.5/ctek-esp32-wroom-32-ota.bin).
 
 1. Open de gatewaypagina en kies **Uitlezen pauzeren en firmware bijwerken**.
    Wacht de actieve poging af en vernieuw de updatepagina.
@@ -127,7 +129,13 @@ Voor een update vanaf beta.1, beta.2 of beta.3:
 4. Bij afgebroken/mislukte upload blijft de huidige firmware geselecteerd.
    Bij **Annuleren** of na vijf minuten inactiviteit hervat het uitlezen.
 
-Controleer na deze update dat de pagina **0.2.0-beta.4** meldt. Klik bij een
+Controleer na deze update dat de pagina **0.2.0-beta.5** meldt. De gateway
+verstuurt de sensorinstellingen opnieuw naar Home Assistant: spanning standaard
+met twee decimalen en beide temperaturen met één decimaal. Instellingen die je
+zelf in Home Assistant hebt gekozen gaan voor. De meetwaarden en bestaande
+sensoridentiteiten blijven behouden; opnieuw toevoegen is niet nodig.
+
+Klik bij een
 sensor **Nu uitlezen** en bekijk de **BLE-log**. Daar staat nu `GATT-discovery`
 met het aantal gevonden punten, gevolgd door de UUID's en hun mogelijkheden.
 Een punt dat ontbreekt, een punt met `read=0` en een echte readfout krijgen
