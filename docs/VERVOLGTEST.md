@@ -14,6 +14,13 @@ stand is bewaard als eerdere overdracht. De nieuwe
 [ESPHome-vergelijking](VERGELIJKING_ESPHOME_CTEK.md) is brononderzoek; grotere
 historie-import is nog een vervolgvoorstel.
 
+Op 12 oktober 2026 is zonder inloggen gecontroleerd dat de repository en
+beta.10-bètarelease publiek beschikbaar zijn. De openbare OTA-download is
+byte voor byte gelijk aan de gecontroleerde firmware. Alles is opgeslagen
+op GitHub. De eigenaar voert op de avond van 12 oktober de laatste
+praktijktests uit; de uitslagen zijn nog niet ontvangen. De vaste beta.10-tag
+en releasebestanden blijven behouden tijdens deze test.
+
 Download [de beta.10 OTA-bin](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.10/ctek-esp32-wroom-32-ota.bin)
 en volg [de wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
 Controleer na installatie versie **0.2.0-beta.10**, behouden instellingen,
