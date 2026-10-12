@@ -35,21 +35,22 @@ van opruimevents. De eerdere GitHub-controle van beta.3 is ook geslaagd.
 
 ## Bewijs uit de fysieke test
 
-De gedeelde diagnostics melden beta.3, 4 MB flash, verbonden wifi en MQTT,
-en gesynchroniseerde tijd. Dit bevestigt nog geen ontvangst van sensormetingen
-in Home Assistant.
+De eerdere diagnostics melden beta.3, 4 MB flash, verbonden wifi en MQTT,
+en gesynchroniseerde tijd. De nieuwste test met beta.4 bevestigt voor plek 3
+een volledige sensoruitlezing en metingen op de beheerpagina. Ontvangst van
+sensormetingen in Home Assistant is nog niet bevestigd.
 
 | Sensorplek | Laatste waarneming | Wat dit aantoont |
 |---|---|---|
 | 1 | Verbinden mislukt, status 13 of 574 | Geen Bluetooth-verbinding; code niet verstuurd |
 | 2 | Verbinden lukt; negen GATT-punten; klok heeft `read=1`; ontgrendelwrite lukt; verbinding verbroken vóór klok-read | Discovery en versturen werken; code en uitlezing nog niet bevestigd |
-| 3 | Verbinden mislukt, status 574 | Ook hier nog geen geslaagde uitlezing |
+| 3 | Beta.4: verbinden lukt; negen GATT-punten; metadata en temperatuur gelezen; twee historierecords volledig ontvangen; `Meting ontvangen` | Eén volledige fysieke uitlezing; huidige code en protocol voor deze sensor bevestigd |
 
 Alle drie de plekken hadden aanvankelijk dezelfde 16-tekencode. De gebruiker
-heeft bevestigd dat nog niet vaststaat of die code bij plek 2 hoort. Er is
-bij geen sensor een geslaagde meting ontvangen. Status 574 is een mislukte
-verbindingsopbouw en ontstaat vóór het versturen van een code. De reden van
-het verbreken bij plek 2 staat nog niet in de beta.3-log.
+had toen bevestigd dat nog niet vaststond of die code bij plek 2 hoorde.
+Tijdens die eerdere tests was nog bij geen sensor een geslaagde meting ontvangen.
+Status 574 is een mislukte verbindingsopbouw en ontstaat vóór het versturen van
+een code. De reden van het verbreken bij plek 2 staat nog niet in de beta.3-log.
 
 Op 12 oktober bevestigt de gebruiker dat telefoon-Bluetooth uit stond en
 sensor 2 wel met de CTEK-app werkt. Na een powercycle en **Nu uitlezen** is
@@ -59,29 +60,58 @@ dezelfde uitval. Dit is geen expliciete bevestiging dat de code van het eigen
 label is gecontroleerd. **Bezig met BLE-uitlezing** verwijst naar de lopende
 poging; de zichtbare log hoort dan nog bij de vorige afgeronde poging.
 
+### Eerste geslaagde uitlezing van plek 3 met beta.4
+
+De gebruiker heeft de sensor in plek 3 door uitschakelen geïdentificeerd en
+de bijbehorende code opgeslagen. Aanvankelijk mislukte verbinden nog met
+status 574; de code werd toen niet verstuurd. Een scan zag dezelfde sensor
+met adrestype 0, als verbindbaar, en met een signaal van −90 dBm. De gebruiker
+heeft de afstand gecorrigeerd naar ongeveer vier meter, zonder metaal ertussen.
+
+Na het verzoek op ongeveer één meter opnieuw te scannen en uit te lezen,
+bevat de volgende gedeelde beta.4-log:
+
+- `connect=1 status=0 (SUCCESS)` en negen gevonden GATT-punten.
+- Een geslaagde ontgrendelwrite, gevolgd door voltooide reads van klok,
+  meetperiode, historiecursor en actuele temperatuur.
+- Geslaagde notificatie-inschakeling en ontvangst van alle twee aangevraagde
+  historierecords, zonder ongeldige records.
+- `Meting ontvangen`; de beheerpagina toont actuele spanning en historische
+  en actuele temperatuur. Er is vóór het eigen opruimen geen disconnect gezien.
+
+Dit bevestigt de huidige code en een volledige uitlezing van deze sensor.
+De pagina meldt twee pogingen, één geslaagd en nul opeenvolgende fouten;
+de tweede poging staat nog op **Bezig met BLE-uitlezing**. Herhaald succes
+is dus nog niet bevestigd. De afstand en signaalsterkte bij de succesvolle
+test zijn nog niet expliciet gemeld. Bereik is een mogelijke verklaring
+voor de eerdere verbindingsfout, maar de oorzaak is hiermee niet bewezen.
+
 Deze notitie bevat geen echte sensoradressen, codes, wachtwoorden of ruwe
 persoonlijke logs. De eigen instellingen blijven op de ESP32 opgeslagen.
 
-## Eerstvolgende test: disconnectreden met beta.4 vastleggen
+## Eerstvolgende test: herhaald uitlezen en ontvangst controleren
 
-1. Download [de OTA-bin van beta.4](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.4/ctek-esp32-wroom-32-ota.bin).
-2. Kies **Uitlezen pauzeren en firmware bijwerken**, wacht de actieve poging
-   af en upload de OTA-bin. Controleer na herstart **0.2.0-beta.4**.
-3. Houd telefoon-Bluetooth uit en de ESP32 dichtbij de sensor in **plek 2**.
-4. Klik op **Nu uitlezen**. Wacht tot **Bezig met BLE-uitlezing** verdwenen is
-   en vernieuw de pagina.
-5. Download diagnostics. De nieuwe regel `BLE-disconnect` noemt de reden,
-   fase en tijd sinds het begin van de poging en ontgrendelwrite. Bewaar de
-   log privé en verwijder adressen vóór openbaar delen.
+1. Laat de huidige poging van plek 3 afronden en vernieuw de pagina.
+   Controleer of **geslaagd** oploopt naar twee en de status **Meting ontvangen** is.
+2. Houd telefoon-Bluetooth uit en laat de ESP32 op dezelfde plek voor enkele
+   automatische uitlezingen. Controleer of het aantal geslaagde pogingen verder
+   oploopt. Noteer afstand en scan-signaalsterkte voor de werkende opstelling.
+3. Controleer of Home Assistant de spanning en temperatuur van deze sensor
+   ontvangt en bij volgende uitlezingen blijft bijwerken. Verbonden MQTT
+   alleen bewijst die ontvangst niet.
+4. Identificeer daarna de overige sensoren en sla per sensor de bijbehorende
+   code op. Test ze één voor één vanuit een opstelling met voldoende ontvangst.
 
-Bij **Meting ontvangen** is een uitlezing met de huidige code bevestigd.
-Controleer dan nog een uitlezing om te testen of herhaald uitlezen werkt.
+## Bij een volgende fout
 
-Als de verbinding opnieuw vóór de klok-read verbreekt, beoordeel de nieuwe
-reden en fase voordat het protocol wordt veranderd. Een disconnectreden
-bewijst op zichzelf geen verkeerde code. De eigen code moet nog tegen het
-sensorlabel of die exact gebruikte code in de officiële app bevestigd worden;
-deel de code zelf niet. Er is nog geen fysieke sensortest van beta.4.
+Wacht tot **Bezig met BLE-uitlezing** verdwenen is en vernieuw de pagina;
+deel daarna de afgeronde BLE-log of diagnostics zonder sensoradressen.
+Bij `connect=0` is de code nog niet verstuurd: controleer scan, adrestype
+en ontvangst. Als verbinden lukt en de verbinding na de ontgrendelwrite
+verbreekt, beoordeel de beta.4-regel `BLE-disconnect` met reden, fase en timing.
+Een disconnectreden bewijst op zichzelf geen verkeerde code. Deel de code
+zelf niet. De succesvolle test van plek 3 bewijst nog niet de oorzaak van
+de eerdere uitval bij plek 2 of de juiste code voor een andere sensor.
 
 ## Codespace stoppen en hervatten
 

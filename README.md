@@ -11,14 +11,14 @@ De [eerdere bètarelease 0.2.0-beta.3](https://github.com/bbartje/CTEK-BLE-GATEW
 blijft beschikbaar.
 
 Beta.4 voegt aan de BLE-log de reden van een verbroken verbinding, de
-uitleesstap en de tijd sinds de poging en ontgrendelwrite toe. Zo kan de
-volgende sensortest de uitval na het ontgrendelbericht beter verklaren.
-Normaal opruimen door de gateway wordt apart gehouden. Deze update verandert
-het ontgrendelprotocol en de wachttijden niet en garandeert geen oplossing.
-De fysieke test met beta.3 vindt alle negen Bluetooth-punten bij plek 2, maar
-de verbinding valt weg vóór de klok-read; ook na een powercycle is nog geen
-geslaagde meting gemeld. Een verstuurd ontgrendelbericht bevestigt de code nog
-niet. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.4.md)
+uitleesstap en de tijd sinds de poging en ontgrendelwrite toe. Normaal opruimen
+door de gateway wordt apart gehouden; het protocol en de wachttijden zijn gelijk.
+Op 12 oktober 2026 is met beta.4 voor **plek 3 de eerste volledige fysieke
+uitlezing bevestigd**: verbinden, ontgrendelen, metadata lezen en twee
+historierecords ontvangen slagen. De beheerpagina toont spanning en temperatuur.
+Daarmee is de opgeslagen code voor deze sensor bevestigd. Herhaald uitlezen,
+de overige plekken en ontvangst van metingen in Home Assistant moeten nog
+worden bevestigd. Zie [de releasenotities](docs/RELEASE_0.2.0-beta.4.md)
 en [de opgeslagen teststatus en vervolgstappen](docs/VERVOLGTEST.md).
 
 **PlatformIO en PuTTY zijn niet nodig om deze firmware te installeren.** Na de
