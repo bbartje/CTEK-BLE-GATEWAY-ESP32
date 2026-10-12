@@ -11,6 +11,12 @@ fieldset,article{border:1px solid #abc1ba;border-radius:8px;padding:1rem;margin:
 label{display:block;margin:.6rem 0}input,select{box-sizing:border-box;width:100%;padding:.55rem}
 #ui-language{width:auto}button,a.button{background:#176459;color:#fff;padding:.6rem .9rem;border:0;border-radius:4px;display:inline-block;margin:.4rem .4rem .4rem 0}
 pre{white-space:pre-wrap;overflow-wrap:anywhere}[hidden]{display:none!important}small{color:#52635f}
+.sensor-slot h3{margin:0 0 .75rem;font-size:1.05rem}
+.sensor-reading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem 1.5rem}
+.sensor-caption{display:block;color:#52635f;font-size:.85rem;margin-bottom:.2rem}
+.sensor-voltage{display:block;font-size:1.8rem;line-height:1.2;overflow-wrap:anywhere}
+.sensor-time{line-height:1.5}.sensor-freshness{display:block;margin-top:.2rem}
+.sensor-settings{margin-top:.8rem;border-top:1px solid #d7e2de;padding-top:.6rem}summary{cursor:pointer}
 </style>
 <script>
 window.addEventListener('DOMContentLoaded', () => {

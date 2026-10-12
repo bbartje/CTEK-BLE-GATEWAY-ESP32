@@ -211,23 +211,27 @@ void root() {
   }
   for (size_t slot = 0; slot < ctek::kMaxSensors; ++slot) {
     const auto& state = states[slot]; const auto& sensor = sensors[slot];
-    page += "<article class='sensor-slot' data-configured='" + String(state.configured ? "1" : "0") + "'" + (state.configured ? "" : " hidden") + "><h3>" + localized("Plek ", "Slot ", "Platz ") + String(slot + 1) + " — " + escape(state.configured ? sensor.name : String("vrij")) + "</h3>";
+    page += "<article class='sensor-slot' data-configured='" + String(state.configured ? "1" : "0") + "'" + (state.configured ? "" : " hidden") + "><h3>";
+    page += state.configured ? escape(sensor.name) : localized("Plek ", "Slot ", "Platz ") + String(slot + 1);
+    page += "</h3>";
     if (state.configured) {
+      page += "<div class='sensor-reading'><div><span class='sensor-caption'>" + localized("Spanning", "Voltage", "Spannung") + "</span><strong class='sensor-voltage'>";
+      if (state.hasReading && state.reading.currentVoltageValid) page += String(state.reading.currentVoltage, 3) + " V";
+      else page += localized("Niet beschikbaar", "Unavailable", "Nicht verfügbar");
+      page += "</strong>";
+      if (state.hasReading && state.reading.currentVoltageValid && !readingFresh(slot)) page += "<small class='sensor-freshness'>" + localized("verouderd", "stale", "veraltet") + "</small>";
+      page += "</div><div class='sensor-time'><span class='sensor-caption'>" + localized("Laatste meting", "Last reading", "Letzte Messung") + "</span>";
+      if (state.hasReading) page += state.readEpoch ? localTime(state.readEpoch) : localized("tijd niet gesynchroniseerd", "time not synchronized", "Zeit nicht synchronisiert");
+      else page += localized("Nog geen meting", "No reading yet", "Noch keine Messung");
+      page += "</div></div><details class='sensor-settings'><summary>" + localized("Details en instellingen", "Details and settings", "Details und Einstellungen") + "</summary>";
       if (state.status == "Meting ontvangen") page += "<p>" + localized("Meting ontvangen", "Reading received", "Messwert empfangen") + "</p>";
       else if (state.status == "Bezig met BLE-uitlezing") page += "<p>" + localized("Bezig met BLE-uitlezing", "BLE read in progress", "BLE-Abfrage läuft") + "</p>";
       else page += "<p>" + escape(state.status) + "</p>";
       if (state.hasReading) {
         const auto& sample = state.reading.samples[state.reading.count - 1];
-        page += "<p>";
-        if (state.reading.currentVoltageValid) page += localized("Spanning nu: ", "Live voltage: ", "Aktuelle Spannung: ") + String(state.reading.currentVoltage, 3) + " V; ";
-        else page += localized("Live-spanning niet beschikbaar; laatste historische spanning: ", "Live voltage unavailable; last historical voltage: ", "Aktuelle Spannung nicht verfügbar; letzte historische Spannung: ") + String(sample.voltage, 3) + " V; ";
-        page += readingFresh(slot) ? localized("actueel", "current", "aktuell") : localized("verouderd", "stale", "veraltet");
-        if (state.reading.currentTemperatureValid) page += "; " + localized("Temperatuur nu: ", "Current temperature: ", "Aktuelle Temperatur: ") + String(state.reading.currentTemperature, 1) + " °C";
-        else if (!state.reading.live) page += "; " + localized("Historische temperatuur: ", "Historical temperature: ", "Historische Temperatur: ") + String(sample.temperature, 1) + " °C";
-        page += "</p>";
-        page += "<p>" + localized("Laatste geslaagde uitlezing: ", "Last successful read: ", "Letzte erfolgreiche Abfrage: ");
-        page += state.readEpoch ? localTime(state.readEpoch) : localized("tijd niet gesynchroniseerd", "time not synchronized", "Zeit nicht synchronisiert");
-        page += "</p>";
+        if (!state.reading.currentVoltageValid) page += "<p>" + localized("Live-spanning niet beschikbaar; laatste historische spanning: ", "Live voltage unavailable; last historical voltage: ", "Aktuelle Spannung nicht verfügbar; letzte historische Spannung: ") + String(sample.voltage, 3) + " V</p>";
+        if (state.reading.currentTemperatureValid) page += "<p>" + localized("Temperatuur nu: ", "Current temperature: ", "Aktuelle Temperatur: ") + String(state.reading.currentTemperature, 1) + " °C</p>";
+        else if (!state.reading.live) page += "<p>" + localized("Historische temperatuur: ", "Historical temperature: ", "Historische Temperatur: ") + String(sample.temperature, 1) + " °C</p>";
       }
       page += "<small>" + localized("Pogingen ", "Attempts ", "Versuche ") + String(state.attempts) + "; " + localized("geslaagd ", "successful ", "erfolgreich ") + String(state.successes) + "; " + localized("opeenvolgende fouten ", "consecutive failures ", "aufeinanderfolgende Fehler ") + String(state.failures) + "</small>";
       page += "<form method='post' action='/poll'>" + token() + "<input type='hidden' name='slot' value='" + String(slot) + "'><button>" + localized("Nu uitlezen", "Read now", "Jetzt abfragen") + "</button></form>";
@@ -239,7 +243,7 @@ void root() {
     page += input("address_type", "Adrestype uit de scan (meestal 0)", "Address type from scan (usually 0)", "Adresstyp aus dem Scan (meist 0)", String(sensor.addressType), "type='number' min='0' max='3' required");
     page += input("code", state.configured ? "Verbindingscode; leeg = behouden bij hetzelfde adres" : "Verbindingscode: 16 tekens, of 11 tekens zonder 40149", state.configured ? "Pairing code; leave blank to keep for the same address" : "Pairing code: 16 characters, or 11 without 40149", state.configured ? "Verbindungscode; leer lassen für dieselbe Adresse" : "Verbindungscode: 16 Zeichen oder 11 ohne 40149", "", "type='password' maxlength='64' autocomplete='new-password'");
     page += "<button>" + localized("Sensor opslaan", "Save sensor", "Sensor speichern") + "</button></form>";
-    if (state.configured) page += "<form method='post' action='/remove'>" + token() + "<input type='hidden' name='slot' value='" + String(slot) + "'><button>" + localized("Sensor verwijderen", "Remove sensor", "Sensor entfernen") + "</button></form>";
+    if (state.configured) page += "<form method='post' action='/remove'>" + token() + "<input type='hidden' name='slot' value='" + String(slot) + "'><button>" + localized("Sensor verwijderen", "Remove sensor", "Sensor entfernen") + "</button></form></details>";
     page += "</article>";
   }
   page += "<button id='add-sensor' type='button' aria-label='Add sensor'>+</button>";

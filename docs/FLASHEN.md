@@ -1,13 +1,13 @@
 # Flash and Set Up the Gateway Without PlatformIO or PuTTY
 
 For **ESP32-WROOM-32, ESP32-D0WD-V3 revision 3, with 4 MB flash** only.
-Firmware **0.2.0-beta.7** has passed software checks, but still needs testing
+Firmware **0.2.0-beta.8** has passed software checks, but still needs testing
 with your physical Battery Sense units. This image is not for ESP32-C3/S3/S2.
 
 ## 1. First Flash with the ESP32 Flash Download Tool
 
 Download the official [Espressif Flash Download Tool](https://www.espressif.com/en/support/download/other-tools).
-Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-factory.bin)
+Download the [complete factory image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.8/ctek-esp32-wroom-32-factory.bin)
 or extract the ZIP from `firmware/releases/`. For USB installation, use
 **ctek-esp32-wroom-32-factory.bin**. PlatformIO is not needed to flash it.
 
@@ -113,11 +113,12 @@ and restarts the setup process above.
    the actual CTEK service is verified when connecting.
 3. Enter a name and the code from the sensor label: 16 characters, or the 11
    characters without the `40149` prefix. Save. You can correct an invalid code
-   on the web page; no reflash is needed.
-4. Refresh after 15–60 seconds. A successful connection shows voltage,
-   temperature, and **Reading received**. A new sensor without history uses live
-   voltage. With the vehicle stationary, compare voltage with the CTEK app or a
-   multimeter, then close the app again.
+   on the web page; open **Details and settings** to edit a saved sensor.
+4. Refresh after 15–60 seconds. The compact sensor card shows its name,
+   voltage, and the last successful measurement time. Open **Details and
+   settings** to check temperature and **Reading received**. A new sensor
+   without history uses live voltage. With the vehicle stationary, compare
+   voltage with the CTEK app or a multimeter, then close the app again.
 5. Confirm the MQTT integration is active in Home Assistant. Under
    **Settings → Devices & services → MQTT**, the device should appear with live
    voltage, current temperature, and **Low voltage** status. Home Assistant
@@ -132,7 +133,10 @@ and restarts the setup process above.
    sensor; the ESP32 does not keep four connections open continuously.
 
 A failure does not produce a zero reading. Old values become unavailable after
-30 minutes. Use **Read now** to request an earlier retry. **Download diagnostics**
+30 minutes. On the card, an old voltage is marked **stale**. Missing live voltage
+is shown as **Unavailable**; the details can show an explicitly labelled
+historical fallback. Open **Details and settings** and use **Read now** to
+request an earlier retry. **Download diagnostics**
 includes procedure details and raw measurement metadata, but no codes or
 passwords. Remove sensor addresses before sharing diagnostics publicly. USB is
 not needed for these checks.
@@ -151,7 +155,7 @@ within range and confirm that it recovers without restarting the board.
 
 ## 5. Update Firmware over Wi-Fi
 
-For an update from beta.1 through beta.6, [download the beta.7 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.7/ctek-esp32-wroom-32-ota.bin).
+For an update from beta.1 through beta.7, [download the beta.8 OTA image](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.8/ctek-esp32-wroom-32-ota.bin).
 
 1. Open the gateway page and select **Pause polling and update firmware**. Wait
    for the active read to finish, then refresh the update page.
@@ -162,9 +166,12 @@ For an update from beta.1 through beta.6, [download the beta.7 OTA image](https:
 4. If an upload is cancelled or fails, the current firmware remains selected.
    Polling resumes after **Cancel** or five minutes of inactivity.
 
-After the update, confirm the page reports **0.2.0-beta.7**. Empty sensor forms
-should appear only after clicking **+**; existing configured sensors stay visible.
-Refreshing the page hides any empty forms that have not been saved. The gateway
+After the update, confirm the page reports **0.2.0-beta.8**. Each configured
+sensor card shows only name, voltage, and the last successful measurement time.
+**Details and settings** starts closed and contains temperature, status,
+counters, **Read now**, logs, and the settings form. Empty sensor forms appear
+only after clicking **+**. Refreshing the page closes the details and hides any
+empty forms that have not been saved. The gateway
 republishes Discovery: voltage defaults to two decimal places and current
 temperature to one. The `voltage`, `temperature`, and `low_voltage` entity IDs
 remain stable. The old separate `current_temperature` and Bluetooth RSSI
@@ -178,7 +185,8 @@ signal become **unknown**, rather than reporting a historical value as current.
 The gateway page labels any historical fallback explicitly. Treat unknown or
 unavailable data as missing information; it does not confirm a healthy battery.
 
-For a sensor, click **Read now** and inspect the **BLE log**. `GATT-discovery`
+For a sensor, open **Details and settings**, click **Read now**, and inspect
+the **BLE log**. `GATT-discovery`
 shows the number of discovered characteristics, their UUIDs, and capabilities.
 A missing characteristic, one with `read=0`, and a failed read have different
 messages. `unlock write: OK` means only that the message was sent; it does not

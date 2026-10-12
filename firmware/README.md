@@ -22,7 +22,7 @@ Complete release bouwen (inclusief bootloader/partities samenvoegen en controles
 python3 firmware/tools/build_release.py
 ```
 
-De nieuwste binaries staan in `releases/0.2.0-beta.7/`; de ZIP staat één niveau
+De nieuwste binaries staan in `releases/0.2.0-beta.8/`; de ZIP staat één niveau
 hoger. `test_release.py` controleert de echte bestanden, beschadigde kopieën,
 partitiegrenzen, overlap, controlesommen, ZIP en de hash van de firmwarebronnen.
 Na bronwijzigingen eerst opnieuw het pakket bouwen; daarna `npm test`.
@@ -191,7 +191,12 @@ alle lege plekken blijven verborgen totdat je op `+` klikt. Iedere klik opent
 één lege plek, ook vóór het opslaan van de eerste sensor. Bij vier ingestelde
 sensoren verdwijnt de plusknop. Niet opgeslagen plekken zijn na verversen weer
 verborgen.
-BLE-logs blijven achter een uitklapmenu.
+Vanaf beta.8 toont een ingestelde sensor een compacte kaart met alleen naam,
+spanning en tijdstip van de laatste geslaagde meting. Temperatuur, status,
+tellers, `Nu uitlezen`, BLE-log, wijzigen en verwijderen staan onder
+`Details en instellingen`, standaard ingeklapt. Ontbrekende live-spanning wordt
+op de kaart als niet beschikbaar getoond; een verouderde waarde blijft als
+verouderd herkenbaar. De meettijd volgt de gekozen lokale tijdzone.
 
 Na iedere herstart met opgeslagen thuiswifi verschijnt twee minuten een herstel-AP met het
 publieke startwachtwoord `CTEK-Start123`; normale wifi-, BLE- en MQTT-start
