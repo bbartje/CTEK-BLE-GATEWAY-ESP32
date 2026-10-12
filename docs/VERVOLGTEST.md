@@ -101,6 +101,20 @@ blijft voorgaan. De nieuwe Discovery-weergave moet nog fysiek worden getest.
 Deze notitie bevat geen echte sensoradressen, codes, wachtwoorden of ruwe
 persoonlijke logs. De eigen instellingen blijven op de ESP32 opgeslagen.
 
+## Hervatten vanavond, 12 oktober 2026
+
+De gebruiker wil vanavond verder testen met een andere sensor. Beta.5 is
+gecommit en naar GitHub gepusht in commit `5807d2a`; de publieke OTA-download
+is byte voor byte vergeleken met het geteste lokale bestand en is gelijk.
+De nieuwste expliciet gemelde firmware op de ESP32 is beta.4. Installatie
+van beta.5 en de nieuwe standaardweergave zijn nog niet bevestigd.
+
+Gebruik voor de volgende sensor het bijbehorende adres, het adrestype uit de
+scan en de eigen code. Begin met de ESP32 dichtbij en telefoon-Bluetooth uit.
+Beoordeel één afgeronde poging tegelijk. Noteer de sensorplek, firmwareversie,
+scan-signaalsterkte en het resultaat; deel geen codes of wachtwoorden.
+De werkende configuratie van plek 3 blijft het referentiepunt.
+
 ## Eerstvolgende test: herhaald uitlezen en ontvangst controleren
 
 1. Laat de huidige poging van plek 3 afronden en vernieuw de pagina.
