@@ -2,10 +2,42 @@
 
 Bijgewerkt op 12 oktober 2026. Eigenaar en beheerder: bbartje.
 
+## Huidige stand voor eigenaar en meelezers
+
+De eigenaar gaat beta.6 via OTA (een firmware-update over wifi) installeren en
+testen en meldt de resultaten daarna. De installatie en de testuitslag zijn
+nog niet bevestigd. Deze notitie bewaart de stand om later verder te gaan.
+
+| Onderdeel | Vastgelegde stand |
+|---|---|
+| Code en flashpakket beta.6 | Gecommit en op GitHub in commit `4a91612`. |
+| OTA-download | Beschikbaar; op 12 oktober opnieuw gedownload met HTTP 200, 1.208.528 bytes. |
+| Laatst bevestigde versie op de ESP32 | Beta.4; beta.6-installatie nog niet bevestigd. |
+| Eerder hardwarebewijs | Eén volledige uitlezing van sensorplek 3 met beta.4 en ontvangst in Home Assistant. |
+| Volgende stap | Eigenaar installeert beta.6 en voert de acceptatietest uit; resultaten volgen. |
+
+Begin bij de [OTA-download voor beta.6](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/raw/refs/heads/main/firmware/releases/0.2.0-beta.6/ctek-esp32-wroom-32-ota.bin)
+en de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
+Lees voor de wijzigingen de [releasenotities](RELEASE_0.2.0-beta.6.md),
+voor de bekende aandachtspunten het
+[kwaliteitsrapport](../KWALITEITSRAPPORT-2026-10-12.md) en voor de controles de
+[acceptatietest](ACCEPTATIETEST.md). Lege testvakken betekenen **niet getest**.
+De softwarecontroles zijn geslaagd; de fysieke beta.6-test en externe
+acceptatie staan nog open. Er is nog geen stabiele versie 1.0.0 vrijgegeven.
+
 ## Opgeslagen firmware
 
 Nieuwste versie: **0.2.0-beta.6**, voor ESP32-WROOM-32 met 4 MB flash.
 Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
+
+- De beta.6-code en het gecontroleerde flashpakket staan op GitHub in commit
+  `4a91612f52d3eb6de8f53ce3ff553b039ffb6b04`.
+- De nieuwe bestanden staan in `firmware/releases/0.2.0-beta.6/`; de ZIP
+  staat één map hoger. De OTA-download is direct beschikbaar vanuit de
+  repository. Zie [de releasenotities](RELEASE_0.2.0-beta.6.md).
+
+### Eerdere vrijgave: beta.3
+
 - De eerdere beta.3-firmware en flashbestanden zijn gecommit en gepusht in
   commit `8db6863f0194155364d02ce2601a1a3342cab8cb`.
 - [De publieke bètarelease](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/tag/v0.2.0-beta.3)
@@ -13,8 +45,8 @@ Bron en flashbestanden staan in deze repository; de eerdere pakketten blijven.
 - [De OTA-bin voor een wifi-update](https://github.com/bbartje/CTEK-BLE-GATEWAY-ESP32/releases/download/v0.2.0-beta.3/ctek-esp32-wroom-32-ota.bin?download=1)
   is 1.181.392 bytes. Grootte en SHA-256 van de publieke download zijn
   gecontroleerd tegen de lokale binary.
-- De nieuwe bestanden staan na de gecontroleerde build in `firmware/releases/0.2.0-beta.6/`; de ZIP
-  staat één map hoger. Zie [de releasenotities](RELEASE_0.2.0-beta.6.md).
+
+### Wijzigingen sinds beta.3
 
 Beta.6 voegt herstel-wifi voor twee minuten na opstart, Nederlands/Engels/Duits,
 een tijdzonekeuze, progressieve sensorplekken en live Home Assistant-waarden toe.
@@ -132,19 +164,27 @@ De werkende configuratie van plek 3 blijft het referentiepunt.
 
 ## Eerstvolgende test: beta.6 op hardware controleren
 
-1. Laat de huidige poging van plek 3 afronden en vernieuw de pagina.
-   Controleer of **geslaagd** oploopt naar twee en de status **Meting ontvangen** is.
-2. Houd telefoon-Bluetooth uit en laat de ESP32 op dezelfde plek voor enkele
-   automatische uitlezingen. Controleer of het aantal geslaagde pogingen verder
-   oploopt. Noteer afstand en scan-signaalsterkte voor de werkende opstelling.
-3. Installeer beta.6 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
-  Controleer live spanning en actuele temperatuur, de lage-spanningsstatus,
-  `BartjeB` bij apparaatinfo en het opruimen van de oude dubbele temperatuur-
-  en RSSI-entiteiten. Eigen Home Assistant-weergaveprecisie blijft leidend.
-4. Controleer dat de beheerpagina tijd in de gekozen lokale tijdzone toont en
-  dat Home Assistant updates blijft ontvangen na meerdere automatische rondes.
-5. Identificeer daarna de overige sensoren en sla per sensor de bijbehorende
-   code op. Test ze één voor één vanuit een opstelling met voldoende ontvangst.
+1. Installeer beta.6 via de [wifi-updatehandleiding](FLASHEN.md#5-update-firmware-over-wi-fi).
+   Pauzeer het uitlezen, wacht tot de lopende poging klaar is en upload de
+   OTA-bin. Controleer na herstart versie **0.2.0-beta.6** en het behoud van
+   wifi-, MQTT- en sensorinstellingen en je eigen wachtwoord.
+2. Begin met de eerder werkende sensor van plek 3. Houd telefoon-Bluetooth uit
+   en wacht op een afgeronde poging met **Meting ontvangen**. Controleer live
+   spanning en actuele temperatuur op de gateway en in Home Assistant.
+3. Controleer de lage-spanningsstatus, `BartjeB` bij apparaatinfo en het opruimen
+   van de oude dubbele temperatuur- en RSSI-entiteiten. Eigen Home
+   Assistant-weergaveprecisie blijft leidend. Controleer ook de lokale tijd.
+4. Laat meerdere automatische uitleesrondes lopen. Controleer dat de geslaagde
+   teller oploopt en Home Assistant verse updates ontvangt. Noteer afstand en
+   scan-signaalsterkte voor de werkende opstelling.
+5. Test de overige sensoren één voor één met hun eigen code en adres. Werk de
+   resterende [acceptatiecontroles](ACCEPTATIETEST.md) af, inclusief herstel,
+   verbindingsuitval en de duurtest. Noteer wat je nog niet hebt getest.
+
+Bij terugkomst zijn firmwareversie, OTA-uitkomst, aantal sensoren, testduur en
+geslaagde of mislukte controles voldoende om verder te gaan. Deel geen codes,
+wachtwoorden of echte sensoradressen. Er worden pas controles als geslaagd
+vastgelegd nadat de eigenaar de uitslag heeft gemeld.
 
 ## Bij een volgende fout
 

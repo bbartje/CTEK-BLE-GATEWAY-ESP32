@@ -22,9 +22,18 @@ uploads. Anyone nearby during the window can still reset the password; use
 recovery in a private setting. Normal network access always requires your own
 admin password.
 
-**Release stage:** beta.6 is the candidate for the owner's final hardware test.
-Use the [acceptance checklist](docs/ACCEPTATIETEST.md) before inviting external
-testers. Keep the beta label during external testing; release 1.0.0 only after
+**Current status (October 12, 2026):** the beta.6 source, factory image, OTA image,
+and ZIP are saved in this repository. The OTA download is available for the
+owner's final hardware test. The owner is preparing to install and test beta.6;
+installation and results have not yet been confirmed. The latest confirmed
+version on the owner's ESP32 is beta.4.
+
+For an overview, read the [beta.6 release notes](docs/RELEASE_0.2.0-beta.6.md).
+The [quality report](KWALITEITSRAPPORT-2026-10-12.md) and
+[test status and next steps](docs/VERVOLGTEST.md) are in Dutch and record the
+software checks, known limitations, and outstanding hardware tests. Use the
+[acceptance checklist](docs/ACCEPTATIETEST.md) before inviting external testers.
+Keep the beta label during external testing; release 1.0.0 only after
 installation, repeated reads, Home Assistant, recovery, and updates have passed
 on testers' own devices.
 
@@ -33,8 +42,7 @@ slot 3 on beta.4**: connection, unlock, metadata reads, and receipt of two histo
 records all succeeded. The admin page displayed voltage and temperature, and
 this confirmed the saved code for that sensor. Voltage and temperature were
 also reported in Home Assistant. Repeated reads, the other sensor slots, and
-beta.6 behavior still need physical confirmation. See the [release notes](docs/RELEASE_0.2.0-beta.6.md)
-and [test status and next steps](docs/VERVOLGTEST.md).
+beta.6 behavior still need physical confirmation.
 
 **PlatformIO and PuTTY are not required to install this firmware.** For the
 first factory flash, connect to `CTEK-Setup-xxxxxx` with the initial password
